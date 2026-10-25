@@ -30,11 +30,28 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				box-shadow: var(--box-shadow);
 			}
 			.prose {
-				width: 720px;
+				width: 860px;
 				max-width: calc(100% - 2em);
 				margin: auto;
 				padding: 1em;
 				color: rgb(var(--gray-dark));
+				display: grid;
+				grid-template-columns: 1fr;
+			}
+			/* when the post has footnotes, keep the reading column at its
+			   normal width and add a right-hand rail alongside it, instead
+			   of shrinking the column to fit a fixed total width */
+			.prose:has(> section[data-footnotes]) {
+				width: 1160px;
+				grid-template-columns: 860px 260px;
+				column-gap: 40px;
+				align-items: start;
+			}
+			@media (max-width: 1220px) {
+				.prose:has(> section[data-footnotes]) {
+					width: 860px;
+					grid-template-columns: 1fr;
+				}
 			}
 			.title {
 				margin-bottom: 1em;
@@ -80,5 +97,18 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			</article>
 		</main>
 		<Footer />
+		<script>
+			const section = document.querySelector('section[data-footnotes]');
+			const list = section?.querySelector('ol');
+			const heading = section?.querySelector('h2');
+			if (list && heading) {
+				const details = document.createElement('details');
+				details.open = true;
+				const summary = document.createElement('summary');
+				summary.textContent = heading.textContent || 'Footnotes';
+				details.append(summary, list);
+				heading.replaceWith(details);
+			}
+		</script>
 	</body>
 </html>

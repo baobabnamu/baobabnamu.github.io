@@ -26,11 +26,11 @@ body {
 	word-wrap: break-word;
 	overflow-wrap: break-word;
 	color: rgb(var(--gray-dark));
-	font-size: 20px;
+	font-size: 17px;
 	line-height: 1.7;
 }
 main {
-	width: 720px;
+	width: 860px;
 	max-width: calc(100% - 2em);
 	margin: auto;
 	padding: 3em 1em;
@@ -76,6 +76,72 @@ p {
 .prose p {
 	margin-bottom: 2em;
 }
+
+/* Section separation: give each h2 real breathing room + a divider line,
+   but not the very first one right under the post title/hr. */
+.prose h2 {
+	margin-top: 3em;
+	padding-top: 1.5em;
+	border-top: 1px solid rgb(var(--gray-light));
+}
+.prose h2:first-of-type {
+	margin-top: 1.5em;
+	padding-top: 0;
+	border-top: none;
+}
+.prose h3 {
+	margin-top: 2em;
+}
+
+/* Footnotes sidebar: place the remark-generated footnotes block in the
+   right-hand grid column (see .prose:has(...) in BlogPost.astro) and keep
+   it in view while scrolling. Falls back to a normal bottom section when
+   .prose isn't in grid mode (no footnotes, or narrow viewport). */
+.prose > * {
+	grid-column: 1;
+}
+.prose > .title {
+	grid-column: 1 / -1;
+}
+.prose > section[data-footnotes] {
+	grid-column: 2;
+	/* `-1` only refers to the end of the *explicit* grid, and we never
+	   declare grid-template-rows (row count varies per post) — so it
+	   wouldn't reach the real last row. A large literal line number forces
+	   the browser to extend the explicit grid to match instead. */
+	grid-row: 2 / 9999;
+	align-self: start;
+	position: sticky;
+	top: 2em;
+	max-height: calc(100vh - 4em);
+	overflow-y: auto;
+	font-size: 0.85em;
+	background: rgb(var(--gray-light));
+	border-radius: 8px;
+	padding: 1em 1.2em;
+}
+.prose > section[data-footnotes] ol {
+	padding-left: 1.2em;
+	margin: 0;
+}
+.prose > section[data-footnotes] summary {
+	cursor: pointer;
+	margin-bottom: 0.75em;
+	font-size: 0.75em;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: rgb(var(--gray));
+}
+@media (max-width: 1220px) {
+	.prose > section[data-footnotes] {
+		grid-column: 1;
+		position: static;
+		max-height: none;
+		overflow: visible;
+		margin-top: 2em;
+	}
+}
 textarea {
 	width: 100%;
 	font-size: 16px;
@@ -85,6 +151,24 @@ input {
 }
 table {
 	width: 100%;
+	border-collapse: collapse;
+	margin-bottom: 2em;
+	font-size: 0.9em;
+}
+th,
+td {
+	padding: 0.6em 0.9em;
+	border: 1px solid rgb(var(--gray-light));
+	text-align: left;
+	vertical-align: top;
+}
+th {
+	background: rgb(var(--gray-light));
+	color: rgb(var(--black));
+	font-weight: 700;
+}
+tr:nth-child(even) td {
+	background: rgba(var(--gray-light), 0.4);
 }
 img {
 	max-width: 100%;
@@ -115,7 +199,7 @@ hr {
 }
 @media (max-width: 720px) {
 	body {
-		font-size: 18px;
+		font-size: 16px;
 	}
 	main {
 		padding: 1em;
