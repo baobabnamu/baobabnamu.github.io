@@ -1,63 +1,82 @@
 ---
-import AboutHeroImage from '../assets/blog-placeholder-about.jpg';
 import Layout from '../layouts/BlogPost.astro';
 ---
 
 <Layout
 	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	heroImage={AboutHeroImage}
+	description="시스템 엔지니어 Bao의 경력 소개"
+	pubDate={new Date('October 25 2026')}
 >
 	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
+		목적에 맞는 기술을 선택할 수 있는 엔지니어를 지향합니다. 베어메탈 서버 운용, IDC 인프라
+		관리부터 클라우드 네이티브 환경까지 다양한 규모의 인프라를 직접 운영하며 자동화와 문제
+		해결 경험을 쌓아왔습니다.
 	</p>
 
-	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
-	</p>
+	<h2>경력</h2>
 
-	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
-	</p>
+	<h3>가비아 (Gabia) · 시스템 엔지니어</h3>
+	<p class="meta">정규직 · 2025년 11월 – 현재 · 1년 · 대한민국 서울 · 대면근무</p>
 
-	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
-	</p>
+	<p><strong>기술파트 (2026.06 ~ 현재)</strong></p>
+	<ul>
+		<li>
+			약 1,000대 규모 HPE x86 베어메탈 서버팜의 프로비저닝 자동화 서비스(1분서버) 운용(HPE iLO,
+			Canonical MaaS)
+		</li>
+		<li>
+			Ansible/AWX 기반 다양한 OS 혼재 환경 운영 및 엔지니어 훈련 플랫폼(Gabia IDC Labs) 개발
+		</li>
+		<li>
+			레거시 환경의 Kubernetes 전환·보안 강화(Wazuh), 장애 알람·GPU 서버 구성 자동화
+		</li>
+	</ul>
 
-	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
-	</p>
+	<p><strong>운영파트 (2025.11 ~ 2026.05)</strong></p>
+	<ul>
+		<li>5개 IDC 센터의 인프라 자원 관리 및 HPE 서버, L2/L4 장비 구성·운용</li>
+		<li>MRTG, Zabbix, Grafana 등을 활용한 실시간 모니터링 및 장애 대응</li>
+		<li>Linux/Windows Server 기반 3-Tier(WEB/WAS/DB) 기술지원 및 GPU 서버 구축 지원</li>
+	</ul>
+
+	<h3>goorm · 카카오 x 구름 딥다이브 클라우드 네이티브 엔지니어링</h3>
+	<p class="meta">시즌 · 2025년 3월 – 2025년 9월 · 7개월 · 경기도 성남시 · 재택근무</p>
+	<ul>
+		<li>Terraform과 Ansible을 활용한 배포 환경의 AWS 인프라 및 Kubernetes 프로비저닝 자동화</li>
+		<li>Vagrant를 활용한 로컬 Kubernetes 클러스터 프로비저닝 자동화</li>
+		<li>GitHub Actions CI 및 ArgoCD를 연계한 GitOps 기반 배포 파이프라인 구현</li>
+	</ul>
+
+	<h3>대한민국공군 · 정보보호병</h3>
+	<p class="meta">공군작전사령부 · 시즌 · 2023년 3월 – 2024년 12월 · 1년 10개월 · 경기도 오산시 · 대면근무</p>
+	<ul>
+		<li>보안 솔루션(FW, WAF, IDS, IPS, TMS 등)을 활용한 정보보호 관제</li>
+		<li>보안 솔루션(NAC, EPP 등)을 활용한 단말기 관리</li>
+		<li>침해 사고 발생 시 tcpdump 등을 활용한 네트워크 분석 및 현장 조사 및 SA 채증</li>
+	</ul>
+
+	<h3>Samjung Data Service Co., Ltd. · 소프트웨어 엔지니어</h3>
+	<p class="meta">정규직 · 2021년 2월 – 2023년 2월 · 2년 1개월 · 대한민국 서울 · 대면근무</p>
+	<ul>
+		<li>
+			Microsoft 365 클라우드 서비스인 Exchange Online, SharePoint, OneDrive, Teams 및 Azure AD 등
+			기술지원
+		</li>
+		<li>
+			Openpyxl, win32.com.client, datetime 라이브러리를 활용한 Python 영업 견적서 자동 발행 프로그램
+			개발
+		</li>
+		<li>R&D 산학연계 프로젝트: Azure 클라우드를 활용한 MSA 서비스 개발(블로그-채용 연계 플랫폼)</li>
+	</ul>
 </Layout>
+
+<style>
+	h3 {
+		margin-bottom: 0.2em;
+	}
+	.meta {
+		color: rgb(var(--gray));
+		font-size: 0.95em;
+		margin-top: 0;
+	}
+</style>
