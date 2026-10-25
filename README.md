@@ -4,11 +4,33 @@ Astro 기반 개인 학습/기록 블로그. GitHub Pages(`baobabnamu.github.io`
 
 ## 글 작성 흐름
 
+글 쓰는 상황에 따라 두 가지 경로를 모두 지원합니다. 어느 경로로 시작하든
+최종적으로는 같은 frontmatter 스키마 + 이미지 규칙을 따르는 markdown이
+`src/content/blog/`에 커밋되는 지점에서 합쳐집니다.
+
+### A. 바로 markdown으로 작성
+
+학습하면서 바로 글로 정리하는 경우.
+
 1. `/drafts/`에서 markdown으로 초안 작성 (이 폴더는 git에 올라가지 않습니다).
 2. 완성되면 `src/content/blog/<slug>.md`로 옮기고, 이미지가 있다면
    `src/assets/posts/<slug>/`에 같이 넣습니다.
 3. frontmatter를 채우고 커밋/푸시하면 GitHub Actions가 자동으로 빌드 후
    GitHub Pages에 배포합니다.
+
+### B. Notion에서 정리 후 동기화 (예정, 미구현)
+
+Notion에서 먼저 정리하는 경우. Notion은 에디터로만 쓰고, git이 계속
+source of truth로 남도록 빌드 타임에 Notion API를 직접 호출하지 않습니다.
+
+1. Notion에서 자유롭게 작성/정리.
+2. 동기화 스크립트가 해당 Notion 페이지를 markdown으로 변환.
+   - 이미지는 Notion의 업로드 URL이 만료되므로 스크립트가 다운로드해서
+     `src/assets/posts/<slug>/`로 재배치하고 링크를 재작성합니다.
+3. 변환 결과를 `src/content/blog/<slug>.md`로 커밋 — 이 지점부터는 A와 동일한
+   흐름(frontmatter 확인 → push → 자동 배포).
+
+> 동기화 스크립트는 아직 구현 전입니다. 진행 상황은 `TODO.md` 5번 참고.
 
 ### frontmatter 스키마 (`src/content.config.ts`)
 
