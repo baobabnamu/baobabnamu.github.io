@@ -14,6 +14,11 @@ const blog = defineCollection({
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: z.optional(image()),
+			tags: z.array(z.string()).default([]),
+			// Safety net: posts should normally never leave /drafts/ until
+			// finished, but this lets an accidentally-committed post stay
+			// out of the live site/RSS feed instead of forcing a revert.
+			draft: z.boolean().default(false),
 		}),
 });
 
