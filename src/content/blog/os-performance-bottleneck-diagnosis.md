@@ -2,6 +2,7 @@
 title: '피크 트래픽에 뻗은 리버스 프록시 — CPU·네트워크 스택 튜닝 발표 자료'
 description: '라이브 프로모션 트래픽 급증으로 발생한 Nginx 504 장애를 CPU governor, IRQ 분산, NIC 큐, TCP 스택 레벨에서 되짚은 서버 엔지니어 관점의 케이스 스터디'
 pubDate: '2026-10-25'
+category: 'infra'
 tags: ['performance', 'linux', 'infra', 'networking']
 draft: false
 ---
