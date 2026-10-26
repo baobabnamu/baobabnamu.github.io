@@ -1,37 +1,119 @@
-name: Deploy to GitHub Pages
+name: Deploy
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Test"]
     branches: [main]
+    types: [completed]
   workflow_dispatch:
 
+# Read the repo; the deploy job additionally gets `pages: write` + `id-token: write`.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Build with Astro
-        uses: withastro/action@v3
+      - uses: actions/checkout@v6
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.33.0
+
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
+          cache: pnpm
 
-  deploy:
-    needs: build
+      - run: pnpm install --frozen-lockfile
+
+      # Resolves the absolute deployment URL the sitemap integration needs:
+      # a `PUBLIC_BASE_URL` variable that already is a full URL (custom domain)
+      # counts as the URL; a bare sub-path is the GitHub Pages project site
+      # (`https://<owner>.github.io/<repo>/`); an empty value is the domain root.
+      # src/utils/base.ts keeps the base path logic; this only feeds the
+      # sitemap and robots.txt, never page links.
+      - name: Resolve deployment URL
+        run: |
+          case "$PUBLIC_BASE_URL" in
+            http*) echo "PUBLIC_SITE_URL=$PUBLIC_BASE_URL" >> "$GITHUB_ENV" ;;
+            "") echo "PUBLIC_SITE_URL=https://${GITHUB_REPOSITORY_OWNER}.github.io/" >> "$GITHUB_ENV" ;;
+            *) echo "PUBLIC_SITE_URL=https://${GITHUB_REPOSITORY_OWNER}.github.io/${PUBLIC_BASE_URL}/" >> "$GITHUB_ENV" ;;
+          esac
+        env:
+          PUBLIC_BASE_URL: ${{ vars.PUBLIC_BASE_URL }}
+
+      - name: Build
+        run: pnpm build
+        env:
+          # A repository variable named PUBLIC_BASE_URL holds the deployment
+          # sub-path. A project site on GitHub Pages is served from
+          # `https://<owner>.github.io/<repo>/`, so that is the repo name.
+          # Leave it empty (or use a full URL such as a custom domain) for a
+          # site served from the domain root. See src/utils/base.ts.
+          PUBLIC_BASE_URL: ${{ vars.PUBLIC_BASE_URL }}
+          # Optional explicit sitemap host override. Keep this unset here:
+          # setting an empty repository variable would mask the PUBLIC_SITE_URL
+          # resolved in the previous step. The resolver already handles the
+          # GitHub Pages URL and custom domains configured via PUBLIC_BASE_URL.
+          # PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+
+      # GitHub Pages serves exactly this artifact at the deployment base.
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy-github-pages:
+    needs: [build]
     runs-on: ubuntu-latest
+    # !IMPORTANT: The `github-pages` environment only admits refs its deployment
+    # branch rules allow, and that takes precedence over the `on: push` filter
+    # above. Keeping this on `main` means the two agree.
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
+
+  # deploy-cloudflare:
+  #   needs: [build]
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     contents: read
+  #     deployments: write
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v6
+  #
+  #     - name: Upload dist artifact
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: dist
+  #         path: dist
+  #
+  #     - name: Download build artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: dist
+  #         path: dist
+  #
+  #     - name: Publish to Cloudflare Pages
+  #       uses: cloudflare/wrangler-action@v3.14.1
+  #       with:
+  #         apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  #         accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+  #         command: pages deploy --branch=${{ github.ref_name }}
+  #         gitHubToken: ${{ secrets.GITHUB_TOKEN }}
