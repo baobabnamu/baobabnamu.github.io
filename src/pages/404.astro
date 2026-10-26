@@ -1,0 +1,49 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { defaultLang } from '@/i18n/ui';
+import { useTranslations } from '@/i18n/utils';
+import { withBase } from '@/utils/base';
+import { getEntry } from 'astro:content';
+
+const config = await getEntry('config', 'site');
+if (!config) throw new Error('Missing "site" entry in the config collection.');
+
+const { brand } = config.data;
+const t = useTranslations(defaultLang);
+const homeUrl = withBase('/');
+const postsUrl = withBase('/posts/');
+---
+
+<BaseLayout title={`${brand.name} · 404`} description={t('notfound.body')} noindex={true}>
+	<main class="px-4 pb-12 pt-6">
+		<div class="max-w-4xl">
+			<p class="label">{t('notfound.kicker')}</p>
+			<h1 class="mt-4 max-w-3xl text-4xl leading-[0.98] tracking-[-0.03em] sm:text-5xl md:text-6xl">
+				{t('notfound.title')}
+			</h1>
+			<p class="mt-8 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
+				{t('notfound.body')}
+			</p>
+
+			<section class="mt-12 border-t border-line pt-4">
+				<div class="flex items-baseline gap-3 font-mono text-xs">
+					<span class="label shrink-0">{t('notfound.pathLabel')}</span>
+					<span class="min-w-0 flex-1 border-b border-dotted border-ink/25" aria-hidden="true"></span>
+					<span class="min-w-0 break-all" id="notfound-path">—</span>
+				</div>
+			</section>
+
+			<hr class="mt-12" />
+			<p class="mt-3 flex flex-wrap gap-x-2 font-mono text-xs">
+				<a href={homeUrl}>{t('common.back')}</a>
+				<span aria-hidden="true">·</span>
+				<a href={postsUrl}>[ {t('nav.posts')} ]</a>
+			</p>
+		</div>
+	</main>
+</BaseLayout>
+
+<script is:inline>
+	const el = document.getElementById('notfound-path');
+	if (el) el.textContent = location.pathname;
+</script>

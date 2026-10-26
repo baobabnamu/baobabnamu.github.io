@@ -1,0 +1,132 @@
+---
+import { getEntry } from "astro:content";
+import { defaultLang, languages, languageTags, type LanguageKey } from "@/i18n/ui";
+import { getLangFromUrl, getPathFromUrl, useTranslatedPath } from "@/i18n/utils";
+import { withBase } from "@/utils/base";
+import { hasTranslation } from "@/utils/translations";
+
+export type Props = {
+  title: string;
+  description?: string;
+  siteName?: string;
+  siteDescription?: string;
+  image?: {
+    src: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+  };
+  type?: "website" | "article";
+  noindex?: boolean;
+};
+
+const {
+  title,
+  description,
+  siteName,
+  siteDescription,
+  image,
+  type = "website",
+  noindex = false,
+} = Astro.props;
+
+const config = await getEntry("config", "site");
+const defaultSiteName = config?.data.brand.name ?? "Print";
+const defaultSiteDescription = config?.data.brand.description ?? "A minimal Astro site.";
+
+const resolvedSiteName = siteName || defaultSiteName;
+const resolvedSiteDescription = description || siteDescription || defaultSiteDescription;
+
+const lang = getLangFromUrl(Astro.url);
+const path = getPathFromUrl(Astro.url);
+const translatePath = useTranslatedPath(lang);
+
+// Only include languages where this specific page actually exists.
+const availableLocales = (Object.keys(languages) as LanguageKey[]).filter((locale) =>
+  hasTranslation(path, locale),
+);
+const hasAlternates = availableLocales.length > 1;
+const defaultLangAvailable = hasTranslation(path, defaultLang);
+
+const pageTitle = title === resolvedSiteName ? title : `${title} · ${resolvedSiteName}`;
+const pageDescription = resolvedSiteDescription;
+
+const siteUrl = Astro.site ?? Astro.url;
+const canonicalUrl = new URL(Astro.url.pathname, siteUrl).toString();
+
+const defaultImage = {
+  src: "/og.jpg",
+  alt: resolvedSiteName,
+  width: 1200,
+  height: 630,
+};
+
+const resolvedImage = {
+  src: image?.src ?? defaultImage.src,
+  alt: image?.alt ?? defaultImage.alt,
+  width: image?.width ?? defaultImage.width,
+  height: image?.height ?? defaultImage.height,
+};
+
+const imageUrl = new URL(withBase(resolvedImage.src), siteUrl).toString();
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="generator" content={Astro.generator} />
+<title>{pageTitle}</title>
+<meta name="description" content={pageDescription} />
+{noindex && <meta name="robots" content="noindex, nofollow" />}
+
+<link rel="canonical" href={canonicalUrl} />
+
+<!-- Theme Color -->
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f6f2" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161615" />
+
+<!-- Favicons & Sitemap -->
+<link id="site-favicon" rel="icon" type="image/svg+xml" href={withBase("/favicon.svg")} />
+<link rel="icon" href={withBase("/favicon.ico")} />
+<link rel="apple-touch-icon" href={withBase("/favicon.svg")} />
+<link rel="sitemap" href={withBase("/sitemap-index.xml")} />
+
+<!-- Language Alternates -->
+{hasAlternates && defaultLangAvailable && (
+  <link
+    rel="alternate"
+    hreflang="x-default"
+    href={new URL(translatePath(path, defaultLang), siteUrl).toString()}
+  />
+)}
+{hasAlternates &&
+  availableLocales.map((locale) => (
+    <link
+      rel="alternate"
+      hreflang={languageTags[locale]}
+      href={new URL(translatePath(path, locale), siteUrl).toString()}
+    />
+  ))}
+
+<!-- OpenGraph -->
+<meta property="og:site_name" content={resolvedSiteName} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={pageDescription} />
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:locale" content={languageTags[lang]} />
+{availableLocales
+  .filter((l) => l !== lang)
+  .map((locale) => (
+    <meta property="og:locale:alternate" content={languageTags[locale]} />
+  ))}
+<meta property="og:image" content={imageUrl} />
+<meta property="og:image:alt" content={resolvedImage.alt} />
+<meta property="og:image:width" content={String(resolvedImage.width)} />
+<meta property="og:image:height" content={String(resolvedImage.height)} />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={pageDescription} />
+<meta name="twitter:image" content={imageUrl} />
+<meta name="twitter:image:alt" content={resolvedImage.alt} />

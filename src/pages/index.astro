@@ -1,33 +1,60 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { getEntry } from 'astro:content';
+import AutoGrid from '@/components/AutoGrid.astro';
+import PostItem from '@/components/PostItem.astro';
+import { defaultLang } from '@/i18n/ui';
+import { useTranslatedPath, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { hiddenPostCount, previewPosts } from '@/utils/postPreview';
+import { postsByCategoryForLang } from '@/utils/posts.ts';
+import { slugify } from '@/utils/slug';
+
+const config = await getEntry('config', 'site');
+if (!config) throw new Error('Missing "site" entry in the config collection.');
+
+const { brand } = config.data;
+
+const lang = defaultLang;
+const postsByCategory = postsByCategoryForLang(lang);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>안녕하세요, Bao입니다 👋</h1>
-			<p>
-				시스템/인프라를 다루며 목적에 맞는 기술을 선택하는 엔지니어입니다. 베어메탈 서버 운용부터
-				클라우드 네이티브 환경까지, 운영 현장에서 마주친 문제를 자동화와 모니터링으로 풀어가는
-				과정을 이 블로그에 기록합니다.
-			</p>
-			<p>
-				현재는 가비아(Gabia)에서 대규모 베어메탈 인프라와 IDC 운영 업무를 자동화하고 있고, 그
-				과정에서 쌓은 Linux, 네트워크, Kubernetes, 보안 관련 경험을 정리해 공유하고 있습니다.
-			</p>
-			<p>
-				더 자세한 경력은 <a href="/about">About</a> 페이지에서, 작성한 글은{' '}
-				<a href="/blog">Blog</a>에서 확인하실 수 있습니다.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<BaseLayout title={brand.name} description={brand.description}>
+	<main class="px-4 pt-6 pb-12">
+		<h1 class="sr-only">{brand.name}</h1>
+		<section>
+			<h2 class="sr-only">{t('home.postsByCategory')}</h2>
+			<AutoGrid minCardWidth={600}>
+				{
+					postsByCategory.map(({ category, posts }) => {
+						const hidden = hiddenPostCount(posts.length);
+						return (
+							<section>
+								<h3 class="flex items-baseline justify-between gap-3 border-b border-line pb-2 text-lg">
+									<a
+										class="uppercase tracking-wide"
+										href={`${translatePath(`/posts/categories/${slugify(category)}`)}/`}
+									>
+										{category}
+									</a>
+									<span class="font-mono text-xs font-normal tracking-widest text-muted">{posts.length}</span>
+								</h3>
+								<ul class="mt-3 list-none space-y-2" role="list">
+									{previewPosts(posts).map((post) => <PostItem post={post} />)}
+									{hidden > 0 && (
+										<li>
+											<a class="label" href={`${translatePath('/posts')}/`}>
+												{t('home.more', { count: hidden })}
+											</a>
+										</li>
+									)}
+								</ul>
+							</section>
+						);
+					})
+				}
+			</AutoGrid>
+		</section>
+	</main>
+</BaseLayout>

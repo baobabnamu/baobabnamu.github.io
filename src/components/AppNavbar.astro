@@ -1,0 +1,41 @@
+---
+import { isPathActive } from "@/utils/nav";
+
+interface Props {
+	navigation: {
+		name: string;
+		url: string;
+		path: string;
+		hideOnMobile?: boolean;
+	}[];
+	/** Current page path without its language prefix, e.g. `/posts`. */
+	path?: string;
+}
+
+const { navigation, path = "/" } = Astro.props;
+---
+
+<nav
+	class="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs tracking-widest uppercase md:flex-col md:items-start md:gap-y-2"
+>
+	{
+		navigation.map((item) => {
+			const isActive = isPathActive(path, item.path);
+
+			return (
+				<a
+					class:list={[
+						"transition-colors hover:text-accent",
+						item.hideOnMobile ? "hidden md:inline" : undefined,
+						isActive ? "tui-active text-accent" : undefined,
+					]}
+					aria-current={isActive ? "page" : undefined}
+					aria-label={isActive ? item.name : undefined}
+					href={item.url}
+				>
+					{item.name}
+				</a>
+			);
+		})
+	}
+</nav>

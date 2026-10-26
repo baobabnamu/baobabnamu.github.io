@@ -1,0 +1,79 @@
+---
+import CategoryList from "@/components/CategoryList.astro";
+import { defaultLang, type LanguageKey } from "@/i18n/ui";
+import { useTranslations } from "@/i18n/utils";
+import {
+  hiddenCategoryCount,
+  previewCategories,
+} from "@/utils/categoryPreview";
+
+interface Props {
+  /** Every category to offer, in display order. */
+  categories: string[];
+  /** Language prefix for the generated links. */
+  lang?: LanguageKey;
+  /** The category of the page being viewed; marked as the current one. */
+  active?: string;
+  /** Base path for category links. Defaults to `/posts/categories`. */
+  basePath?: string;
+}
+
+const { categories, lang = defaultLang, active, basePath = "/posts/categories" } = Astro.props;
+
+const t = useTranslations(lang);
+
+const preview = previewCategories(categories);
+const rest = categories.slice(preview.length);
+const hidden = hiddenCategoryCount(categories.length);
+---
+
+{/* Small screens: a preview plus a "… more" control; from `md` up, the full list (see styles). */}
+<nav
+  aria-label={t("categories.title")}
+  class="mb-6 w-fit whitespace-nowrap md:mb-0"
+>
+  <p class="label">{t("categories.title")}</p>
+  <div class="mt-3">
+    <CategoryList categories={preview} lang={lang} active={active} basePath={basePath} />
+    {hidden > 0 && (
+      <details class="group category-details mt-1">
+        <summary
+          data-test="category-more"
+          class="label flex cursor-pointer list-none items-center justify-between gap-2 select-none underline-offset-[3px] hover:underline hover:decoration-accent md:hidden"
+        >
+          <span class="group-open:hidden">
+            {t("categories.more", { count: hidden })}
+          </span>
+          <span class="hidden group-open:inline">{t("categories.less")}</span>
+          <span aria-hidden="true" class="text-accent group-open:hidden">
+            [ + ]
+          </span>
+          <span aria-hidden="true" class="hidden text-accent group-open:inline">
+            [ − ]
+          </span>
+        </summary>
+        <CategoryList categories={rest} lang={lang} active={active} basePath={basePath} />
+      </details>
+    )}
+  </div>
+</nav>
+
+<style>
+  /* Keep the summary below the list even when expanded, so the control stays under what it toggles. */
+  .category-details {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.25rem;
+  }
+
+  /* From `md` up, force the disclosure open, undoing both closed-state hiding mechanisms. */
+  @media (min-width: 48rem) {
+    .category-details > ul {
+      display: block;
+    }
+
+    .category-details::details-content {
+      content-visibility: visible;
+    }
+  }
+</style>

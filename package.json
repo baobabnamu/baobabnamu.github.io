@@ -1,26 +1,44 @@
 {
   "name": "blog",
-  "type": "module",
   "version": "0.0.1",
-  "engines": {
-    "node": ">=22.23.4"
-  },
+  "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro",
-    "check": "astro check"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "pnpm build && playwright test && pnpm test:e2e:deploy",
+    "test:e2e:deploy": "playwright test -c playwright.deploy.config.ts",
+    "typecheck": "astro check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check",
+    "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^8.1.1",
-    "@astrojs/rss": "^4.0.19",
+    "@astrojs/markdown-satteri": "0.4.3",
+    "@astrojs/mdx": "^8.1.0",
     "@astrojs/sitemap": "^3.7.4",
-    "astro": "^7.4.2",
-    "sharp": "^0.35.0"
+    "astro": "^7.3.8",
+    "astro-expressive-code": "^0.44.3",
+    "pele": "^1.9.0",
+    "satteri": "0.10.5"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.12",
-    "typescript": "^6.0.3"
-  }
+    "@astrojs/check": "^0.9.10",
+    "@playwright/test": "^1.64.0",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^22.19.0",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319"
 }

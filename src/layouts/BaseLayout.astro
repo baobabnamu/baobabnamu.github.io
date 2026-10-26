@@ -1,0 +1,107 @@
+---
+import '@/styles/global.css';
+import { getEntry } from 'astro:content';
+import AppFooter from '@/components/AppFooter.astro';
+import AppNavbar from '@/components/AppNavbar.astro';
+import AppLogo from '@/components/AppLogo.astro';
+import HeadSeo, { type Props as HeadSeoProps } from '@/components/HeadSeo.astro';
+import { languageTags } from '@/i18n/ui';
+import { getLangFromUrl, getPathFromUrl, useTranslatedPath, useTranslations } from '@/i18n/utils';
+import { buildNav } from '@/utils/nav';
+
+interface Props extends HeadSeoProps {}
+
+const lang = getLangFromUrl(Astro.url);
+const path = getPathFromUrl(Astro.url);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+
+const config = await getEntry('config', 'site');
+if (!config) throw new Error('Missing "site" entry in the config collection.');
+
+const { brand, navigation } = config.data;
+const nav = buildNav(navigation, t, translatePath);
+const homeUrl = translatePath('/');
+---
+
+<!doctype html>
+<html lang={languageTags[lang]}>
+	<head>
+		<HeadSeo {...Astro.props} />
+		<script is:inline>
+			try {
+				const theme = localStorage.getItem("theme") === "dark" ? "dark" : "light";
+				document.documentElement.dataset.theme = theme;
+				document.documentElement.style.colorScheme = theme;
+			} catch {
+				document.documentElement.dataset.theme = "light";
+				document.documentElement.style.colorScheme = "light";
+			}
+		</script>
+		<slot name="head" />
+	</head>
+	<body>
+		<div
+			data-test="sidebar"
+			class="fixed left-0 top-0 z-10 flex h-(--navbar-height) w-full items-center justify-between gap-4 border-b border-line bg-paper px-4 md:h-full md:w-(--navbar-width) md:flex-col md:items-start md:justify-start md:border-b-0 md:px-4 md:py-5"
+		>
+			<header
+				id="top"
+				data-test="navbar"
+				class="flex min-w-0 items-center gap-4 md:w-full md:flex-col md:items-start"
+			>
+				<AppLogo name={brand.name} href={homeUrl} />
+				<AppNavbar navigation={nav} path={path} />
+			</header>
+			<div class="flex shrink-0 items-center gap-4 md:mt-auto md:block">
+				<button
+					data-test="theme-toggle"
+					type="button"
+					class="label cursor-pointer appearance-none border-0 bg-transparent p-0 text-muted hover:text-ink md:mt-5"
+					aria-label={t('theme.toggle')}
+					aria-pressed="false"
+					data-light-label={t('theme.light')}
+					data-dark-label={t('theme.dark')}
+				>
+					{t('theme.light')}
+				</button>
+			</div>
+		</div>
+		<div class="mt-(--navbar-height) flex flex-1 flex-col md:mt-0 md:ml-(--navbar-width)">
+			<slot />
+			<AppFooter
+				class="mt-auto"
+				copyright={brand.copyright}
+				socials={brand.socials}
+				linksLabel={t('footer.links')}
+			/>
+		</div>
+		<script>
+			import { startFaviconBlink } from '@/utils/favicon';
+			import { getTheme, themeStorageKey, toggleTheme } from '@/utils/theme';
+
+			startFaviconBlink();
+
+			const toggle = document.querySelector<HTMLButtonElement>('[data-test="theme-toggle"]');
+
+			const applyTheme = (theme: 'light' | 'dark') => {
+				document.documentElement.dataset.theme = theme;
+				document.documentElement.style.colorScheme = theme;
+				toggle?.setAttribute('aria-pressed', String(theme === 'dark'));
+				if (toggle) {
+					toggle.textContent =
+						theme === 'dark' ? (toggle.dataset.darkLabel ?? '') : (toggle.dataset.lightLabel ?? '');
+				}
+			};
+
+			let theme = getTheme(localStorage.getItem(themeStorageKey));
+			applyTheme(theme);
+
+			toggle?.addEventListener('click', () => {
+				theme = toggleTheme(theme);
+				localStorage.setItem(themeStorageKey, theme);
+				applyTheme(theme);
+			});
+		</script>
+	</body>
+</html>

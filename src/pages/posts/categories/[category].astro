@@ -1,0 +1,44 @@
+---
+import CategoryNav from '@/components/CategoryNav.astro';
+import PostItem from '@/components/PostItem.astro';
+import { defaultLang } from '@/i18n/ui';
+import { useTranslatedPath, useTranslations } from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { categoriesByLang, postsByLang } from '@/utils/posts.ts';
+import { slugify } from '@/utils/slug';
+
+export function getStaticPaths() {
+	return categoriesByLang(defaultLang).map((category) => ({
+		params: { category: slugify(category) },
+		props: { category },
+	}));
+}
+
+const lang = defaultLang;
+const { category } = Astro.props;
+const categories = categoriesByLang(lang);
+const posts = postsByLang(lang).filter((post) => post.data.category === category);
+
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+---
+
+<BaseLayout title={`${category} · ${t('categories.title')}`} description={t('categories.description')}>
+	<main class="px-4 pt-6 pb-12">
+		<div class="md:flex md:gap-8">
+			<CategoryNav categories={categories} lang={lang} active={category} />
+			<div class="md:min-w-0 md:flex-1">
+				<h1 class="text-3xl tracking-tight uppercase">{category}</h1>
+				<p class="label mt-2">
+					{t('posts.count', { count: posts.length })}
+				</p>
+				<hr class="mt-4" />
+				<ul class="mt-6 list-none space-y-2" role="list">
+					{posts.map((post) => <PostItem post={post} />)}
+				</ul>
+				<hr class="mt-10" />
+				<p class="mt-3 font-mono text-xs"><a href={translatePath('/posts')}>{t('common.back')}</a></p>
+			</div>
+		</div>
+	</main>
+</BaseLayout>

@@ -1,0 +1,20 @@
+---
+interface Props {
+	name: string;
+	href: string;
+}
+
+const { name, href } = Astro.props;
+---
+
+<a
+	class="hidden items-baseline gap-1.5 text-2xl leading-none font-bold tracking-tight sm:inline-flex"
+	href={href}
+>
+	{name}
+	<span
+		data-test="logo-cursor"
+		class="inline-block h-[0.72em] w-[0.5em] shrink-0 animate-blink bg-accent"
+		aria-hidden="true"
+	></span>
+</a>

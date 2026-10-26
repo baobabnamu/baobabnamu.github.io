@@ -1,0 +1,39 @@
+---
+import { createHash } from "node:crypto";
+import { render } from "pele";
+
+interface Props {
+  chart: string;
+  caption?: string;
+  /** SVG id prefix supplied by the remark plugin, unique per page. */
+  id?: string;
+}
+
+const { chart, caption, id } = Astro.props;
+
+const idPrefix = `pele-${id ?? createHash("sha1").update(chart).digest("hex").slice(0, 10)}`;
+
+// Pele measures labels while rendering, so this has to match --font-sans.
+const FONT_FAMILY = '"Helvetica Neue", Helvetica, Arial, "Liberation Sans", system-ui, sans-serif';
+
+// Match the .prose measure (68ch ≈ 640px) so wide diagrams wrap or reflow
+// instead of being scaled down to unreadable text by CSS.
+const MAX_WIDTH = 640;
+
+let svg: string;
+
+try {
+  ({ svg } = render(chart, { idPrefix, fontFamily: FONT_FAMILY, maxWidth: MAX_WIDTH }));
+} catch (error) {
+  // The build should fail rather than ship a page with a missing diagram.
+  const message = error instanceof Error ? error.message : String(error);
+  throw new Error(`Could not render a Mermaid diagram:\n\n${chart}\n\n${message}`, {
+    cause: error,
+  });
+}
+---
+
+<figure class="mermaid-figure" role="group" aria-label={caption ?? "Diagram"}>
+  <div class="mermaid" set:html={svg}></div>
+  {caption && <figcaption class="label mt-2">{caption}</figcaption>}
+</figure>

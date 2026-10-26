@@ -1,0 +1,46 @@
+---
+import CategoryNav from '@/components/CategoryNav.astro';
+import Mermaid from '@/components/Mermaid.astro';
+import NoteFeed from '@/components/NoteFeed.astro';
+import { defaultLang } from '@/i18n/ui';
+import {
+	getSlugFromId,
+	useTranslatedPath,
+	useTranslations,
+} from '@/i18n/utils';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { noteCategoriesByLang, notesByLang } from '@/utils/notes';
+import { render } from 'astro:content';
+
+export function getStaticPaths() {
+	return notesByLang(defaultLang).map((note) => ({
+		params: { slug: getSlugFromId(note.id) },
+		props: { note },
+	}));
+}
+
+const { note } = Astro.props;
+const { Content } = await render(note);
+const { headline, category } = note.data;
+
+const lang = defaultLang;
+const notes = notesByLang(lang);
+const categories = noteCategoriesByLang(lang);
+const t = useTranslations(lang);
+const translatePath = useTranslatedPath(lang);
+---
+
+<BaseLayout title={headline} description={headline} type="article">
+	<main class="px-4 pt-6 pb-12">
+		<div class="md:flex md:gap-8">
+			<CategoryNav categories={categories} lang={lang} active={category} basePath="/notes/categories" />
+			<div class="md:min-w-0 md:flex-1">
+				<NoteFeed notes={notes} currentSlug={note.id}>
+					<Content components={{ Mermaid }} />
+				</NoteFeed>
+				<hr class="mt-10" />
+				<p class="mt-3 font-mono text-xs"><a href={translatePath('/')}>{t('common.back')}</a></p>
+			</div>
+		</div>
+	</main>
+</BaseLayout>

@@ -1,0 +1,19 @@
+---
+import { autoFillColumns } from '@/utils/grid';
+
+interface Props {
+	minCardWidth?: number;
+	class?: string;
+}
+
+const { minCardWidth = 320, class: className } = Astro.props;
+const columns = autoFillColumns(minCardWidth);
+---
+
+<div
+	class:list={['grid gap-x-8 gap-y-10', className]}
+	style={`grid-template-columns: ${columns};`}
+	data-auto-grid
+>
+	<slot />
+</div>

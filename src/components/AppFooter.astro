@@ -1,0 +1,32 @@
+---
+interface Props {
+	/** Copyright line shown first in the footer. */
+	copyright: string;
+	/** Social links listed after the label. */
+	socials: {
+		name: string;
+		url: string;
+	}[];
+	/** Label introducing the social links. */
+	linksLabel: string;
+	/** Extra classes for the footer element. */
+	class?: string;
+}
+
+const { copyright, socials, linksLabel, class: className } = Astro.props;
+---
+
+<footer data-test="footer" class:list={['px-4 pb-5', className]}>
+	<p class="mt-3 flex flex-wrap gap-x-2 font-mono text-xs tracking-widest uppercase text-muted">
+		<span>{copyright}</span>
+		<span>·</span>
+		<span>{linksLabel}</span>
+		{
+			socials.map((social) => (
+				<a class="text-ink transition-colors hover:text-accent" href={social.url}>
+					{social.name}
+				</a>
+			))
+		}
+	</p>
+</footer>

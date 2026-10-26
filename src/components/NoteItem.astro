@@ -1,0 +1,29 @@
+---
+import { getSlugFromId } from '@/i18n/utils';
+import { formatDate } from '@/utils/date';
+import { withBase } from '@/utils/base';
+
+interface Props {
+	note: {
+		id: string;
+		data: {
+			headline: string;
+			publishDate: Date;
+			category: string;
+		};
+	};
+	/** Language prefix for the link, so notes live under `/{lang}/notes/`. */
+	lang?: string;
+}
+
+const { note, lang = 'en' } = Astro.props;
+const slug = getSlugFromId(note.id);
+---
+
+<li class="flex items-baseline gap-3 leading-snug">
+	<a class="min-w-0 truncate" href={withBase(`/${lang}/notes/${slug}/#note-${slug}`)}>
+		{note.data.headline}
+	</a>
+	<span class="flex-1 border-b border-dotted border-ink/25" aria-hidden="true" />
+	<span class="shrink-0 font-mono text-xs text-muted">{formatDate(note.data.publishDate)}</span>
+</li>

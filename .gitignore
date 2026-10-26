@@ -26,8 +26,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# === Playwright ===
+playwright-report/
+test-results/
+
 # === Local-only content (never pushed to this public repo) ===
-# Work-in-progress posts — moved into src/content/blog/ only when ready to publish.
+# Work-in-progress posts — moved into src/content/post/ only when ready to publish.
 /drafts/
 # Staging area for raw exports (e.g. Tistory HTML export) and any personal
 # scratch notes before they're cleaned up and turned into markdown posts.
