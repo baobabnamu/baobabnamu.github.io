@@ -170,6 +170,23 @@ th {
 tr:nth-child(even) td {
 	background: rgba(var(--gray-light), 0.4);
 }
+.category-badge {
+	display: inline-block;
+	margin-bottom: 0.5em;
+	padding: 0.2em 0.7em;
+	border-radius: 999px;
+	background: rgb(var(--gray-light));
+	color: var(--accent);
+	font-size: 0.8em;
+	font-weight: 700;
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+.category-badge:hover {
+	background: var(--accent);
+	color: #fff;
+}
 img {
 	max-width: 100%;
 	height: auto;

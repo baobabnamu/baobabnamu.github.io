@@ -93,6 +93,11 @@ const posts = (await getCollection('blog', ({ data }) => import.meta.env.DEV || 
 				<ul>
 					{posts.map((post) => (
 						<li>
+							{post.data.category && (
+								<a class="category-badge" href={`/blog/category/${post.data.category}/`}>
+									{post.data.category}
+								</a>
+							)}
 							<a href={`/blog/${post.id}/`}>
 								{post.data.heroImage && (
 									<Image width={720} height={360} src={post.data.heroImage} alt="" />
