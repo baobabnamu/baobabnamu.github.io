@@ -3,7 +3,7 @@ import { hasTranslation } from "@/utils/translations";
 
 describe("hasTranslation", () => {
   it("treats static pages as available in the (only) language", () => {
-    for (const path of ["/", "/about", "/posts", "/notes"]) {
+    for (const path of ["/", "/about", "/posts", "/portfolio"]) {
       expect(hasTranslation(path, "ko")).toBe(true);
     }
   });
@@ -14,14 +14,9 @@ describe("hasTranslation", () => {
     expect(hasTranslation("/posts/does-not-exist/", "ko")).toBe(false);
   });
 
-  it("follows which notes actually exist — there are none yet", () => {
-    expect(hasTranslation("/notes/anything/", "ko")).toBe(false);
-  });
-
   it("follows which categories actually exist", () => {
     expect(hasTranslation("/posts/categories/infra/", "ko")).toBe(true);
     expect(hasTranslation("/posts/categories/does-not-exist/", "ko")).toBe(false);
-    expect(hasTranslation("/notes/categories/anything/", "ko")).toBe(false);
   });
 
   it("assumes unknown paths exist rather than crossing out the only language", () => {
