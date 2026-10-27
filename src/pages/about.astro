@@ -1,32 +1,81 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getEntry } from 'astro:content';
+import { defaultLang } from '@/i18n/ui';
+import { useTranslations } from '@/i18n/utils';
 
 const config = await getEntry('config', 'site');
 if (!config) throw new Error('Missing "site" entry in the config collection.');
 
 const { brand } = config.data;
+const lang = defaultLang;
+const t = useTranslations(lang);
 
 const content = {
-	kicker: 'INTRODUCE',
-	title: '목적에 맞는 기술을 선택할 수 있는 엔지니어의 기록.',
-	description: `${brand.name} 소개 — 서버/인프라 관점에서 쓰는 실무 기록.`,
-	intro: [
-		'안녕하세요, Bao입니다 :)',
-		'겉으로 그럴싸해 보이는 해결책보다, 실제로 측정하고 검증한 결과를 남기는 걸 우선합니다.',
-		'인프라뿐만 아니라 개발, AI, 보안 등 다양한 분야에 대해 거리낌 없이 빠르게 학습합니다.',
-		'지금은 조금 더디더라도, 꾸준한 개선이 길게 보면 팀 전체의 시간을 아껴준다고 생각합니다.',
-	],
+	kicker: 'ABOUT ME',
+	description: `${brand.name} 소개 — 엔지니어 인트로와 포트폴리오.`,
+	intro: {
+		kicker: 'INTRODUCE',
+		title: '목적에 맞는 기술을 선택할 수 있는 엔지니어의 기록.',
+		lines: [
+			'안녕하세요, Bao입니다 :)',
+			'겉으로 그럴싸해 보이는 해결책보다, 실제로 측정하고 검증한 결과를 남기는 걸 우선합니다.',
+			'인프라뿐만 아니라 개발, AI, 보안 등 다양한 분야에 대해 거리낌 없이 빠르게 학습합니다.',
+			'지금은 조금 더디더라도, 꾸준한 개선이 길게 보면 팀 전체의 시간을 아껴준다고 생각합니다.',
+		],
+	},
+	portfolio: {
+		kicker: 'PORTFOLIO',
+		title: '준비 중입니다.',
+		body: '대표 프로젝트를 정리하는 중입니다. 곧 이 페이지에서 확인하실 수 있습니다.',
+	},
 };
+
+const sections = [
+	{ id: 'introduce', name: 'Introduce' },
+	{ id: 'portfolio', name: 'Portfolio' },
+];
 ---
 
 <BaseLayout title={`${brand.name} — ${content.kicker}`} description={content.description}>
-	<main class="px-4 pb-12 pt-6">
-		<div class="max-w-5xl">
-			<p class="label">{content.kicker}</p>
-			<h1 class="mt-4 max-w-3xl text-4xl leading-[0.98] tracking-[-0.045em] sm:text-5xl md:text-6xl">{content.title}</h1>
-			<div class="mt-8 max-w-5xl space-y-3 text-lg leading-relaxed text-muted md:text-xl">
-				{content.intro.map((line) => <p>{line}</p>)}
+	<main class="px-4 pt-6 pb-12">
+		<div class="md:flex md:gap-8">
+			<nav aria-label={t('sections.title')} class="mb-6 w-fit whitespace-nowrap md:mb-0">
+				<p class="label">{t('sections.title')}</p>
+				<ul class="mt-3 list-none space-y-1" role="list">
+					{
+						sections.map((section) => (
+							<li>
+								<a href={`#${section.id}`}>{section.name}</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+			<div class="md:min-w-0 md:flex-1">
+				<p class="label">{content.kicker}</p>
+
+				<section id="introduce">
+					<p class="label mt-6">{content.intro.kicker}</p>
+					<h1 class="mt-4 max-w-3xl text-4xl leading-[0.98] tracking-[-0.045em] sm:text-5xl md:text-6xl">
+						{content.intro.title}
+					</h1>
+					<div class="mt-8 max-w-4xl space-y-3 text-lg leading-relaxed text-muted md:text-xl">
+						{content.intro.lines.map((line) => <p>{line}</p>)}
+					</div>
+				</section>
+
+				<hr class="mt-12" />
+
+				<section id="portfolio" class="mt-12">
+					<p class="label">{content.portfolio.kicker}</p>
+					<h2 class="mt-4 max-w-3xl text-3xl leading-[0.98] tracking-[-0.045em] sm:text-4xl">
+						{content.portfolio.title}
+					</h2>
+					<p class="mt-6 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">
+						{content.portfolio.body}
+					</p>
+				</section>
 			</div>
 		</div>
 	</main>

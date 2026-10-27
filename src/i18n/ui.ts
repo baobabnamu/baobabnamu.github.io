@@ -26,8 +26,7 @@ export const languageShortNames = {
 const ko = {
   "nav.home": "Home",
   "nav.posts": "Posts",
-  "nav.portfolio": "Portfolio",
-  "nav.about": "Introduce",
+  "nav.about": "About Me",
   "home.postsByCategory": "Posts by Category",
   "home.more": "… {count}개 더",
   "posts.title": "POSTS",
@@ -37,6 +36,7 @@ const ko = {
   "categories.description": "Posts grouped by category, newest first.",
   "categories.more": "… {count} more",
   "categories.less": "… less",
+  "sections.title": "Sections",
   "common.back": "[ 뒤로 ]",
   "common.top": "[ 위로 ]",
   "footer.links": "연결:",

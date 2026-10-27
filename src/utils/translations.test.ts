@@ -3,7 +3,7 @@ import { hasTranslation } from "@/utils/translations";
 
 describe("hasTranslation", () => {
   it("treats static pages as available in the (only) language", () => {
-    for (const path of ["/", "/about", "/posts", "/portfolio"]) {
+    for (const path of ["/", "/about", "/posts"]) {
       expect(hasTranslation(path, "ko")).toBe(true);
     }
   });

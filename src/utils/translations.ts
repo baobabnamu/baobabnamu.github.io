@@ -58,7 +58,6 @@ export const hasTranslation = (path: string, lang: LanguageKey): boolean => {
     return false;
   }
 
-  // Home, about, portfolio, and any future static page are translated by
-  // the layout.
+  // Home, about, and any future static page are translated by the layout.
   return true;
 };
