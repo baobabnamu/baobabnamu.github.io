@@ -25,7 +25,7 @@ test("navigation renders in English with clean, unprefixed URLs", async ({ page 
     "href",
     "/",
   );
-  await expect(page.getByRole("link", { name: "Posts", exact: true })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Post", exact: true })).toHaveAttribute(
     "href",
     "/posts",
   );

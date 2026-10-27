@@ -45,8 +45,8 @@ test("a post page stays inside the sub-path", async ({ page }) => {
 test("following an internal link keeps the visitor inside the sub-path", async ({ page }) => {
   await page.goto(`${BASE}/`);
 
-  await page.getByRole("navigation").getByRole("link", { name: "Posts" }).click();
+  await page.getByRole("navigation").getByRole("link", { name: "Post" }).click();
 
   await expect(page).toHaveURL(new RegExp(`${BASE}/posts/?$`));
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("POSTS");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("POST");
 });

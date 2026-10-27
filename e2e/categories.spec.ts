@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 // checks that still hold with a single category.
 
 const categoriesNav = (page: Page) =>
-  page.getByRole("main").getByRole("navigation", { name: "Categories" });
+  page.getByRole("main").getByRole("navigation", { name: "Category" });
 
 const postRows = (page: Page) =>
   page

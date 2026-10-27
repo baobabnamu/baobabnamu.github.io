@@ -11,7 +11,7 @@ describe("CategoryNav", () => {
   it("renders a nav landmark labelled after the categories title", async () => {
     const html = await renderNav(["CSS"]);
 
-    expect(html).toMatch(/<nav\b[^>]*aria-label="Categories"/);
+    expect(html).toMatch(/<nav\b[^>]*aria-label="Category"/);
   });
 
   it("renders one link per category, each pointing at its own page", async () => {
