@@ -11,6 +11,21 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # Content-only changes (a new/edited post, README) can't break
+      # rendering/navigation logic, so there's no point paying for a full
+      # browser-automation run on every typo fix. Anything else (components,
+      # layouts, pages, config, deps, this workflow file, ...) still gets
+      # the full e2e suite.
+      - name: Detect change scope
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            e2e-relevant:
+              - '**'
+              - '!src/content/**'
+              - '!README.md'
+
       - uses: pnpm/action-setup@v6
         with:
           version: 10.33.0
@@ -23,6 +38,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Cache Playwright browsers
+        if: steps.filter.outputs.e2e-relevant == 'true'
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
@@ -31,7 +47,19 @@ jobs:
       # Idempotent: if the cache above restored the browser binary, this
       # skips the (slow) download and only does the quick apt-get check for
       # OS-level deps.
-      - run: pnpm exec playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        if: steps.filter.outputs.e2e-relevant == 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
       - run: pnpm typecheck
       - run: pnpm test
-      - run: pnpm test:e2e
+
+      - name: E2E tests
+        if: steps.filter.outputs.e2e-relevant == 'true'
+        run: pnpm test:e2e
+
+      # test:e2e normally covers the build check too; run it explicitly when
+      # e2e was skipped so a content-only push still proves the site builds.
+      - name: Build
+        if: steps.filter.outputs.e2e-relevant != 'true'
+        run: pnpm build
