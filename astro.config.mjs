@@ -30,10 +30,6 @@ const site = resolveSite(process.env.PUBLIC_SITE_URL) ?? resolveSite(process.env
 export default defineConfig({
   base,
   site,
-  // Portfolio merged into the About Me page as its own section.
-  redirects: {
-    "/portfolio": "/about#portfolio",
-  },
   markdown: {
     // MDX inherits this processor, so the mermaid plugin covers every entry.
     processor: satteri({ mdastPlugins: [mermaid] }),

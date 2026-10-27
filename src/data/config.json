@@ -22,6 +22,10 @@
         "url": "/posts"
       },
       {
+        "translationKey": "nav.portfolio",
+        "url": "/portfolio"
+      },
+      {
         "translationKey": "nav.about",
         "url": "/about"
       }
