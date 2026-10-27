@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Only one post/category exists today ("infra"), so the old multi-category
+// Only one post/category exists today ("ops"), so the old multi-category
 // preview/overflow and cross-language tests don't apply — trimmed to what's
 // actually testable against this content, matching the structural/responsive
 // checks that still hold with a single category.
@@ -19,20 +19,20 @@ test("home category heading links into that category's page", async ({ page }) =
 
   const heading = page.getByRole("main").getByRole("heading", { level: 3 }).first();
   const link = heading.getByRole("link");
-  await expect(link).toHaveAttribute("href", "/posts/categories/infra/");
+  await expect(link).toHaveAttribute("href", "/posts/categories/ops/");
 
   await link.click();
-  await expect(page).toHaveURL(/\/posts\/categories\/infra\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("INFRA");
+  await expect(page).toHaveURL(/\/posts\/categories\/ops\/$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("OPS");
 });
 
 test("the category page marks the current category and lists only its posts", async ({ page }) => {
-  await page.goto("/posts/categories/infra/");
+  await page.goto("/posts/categories/ops/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("INFRA");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("OPS");
 
   const nav = categoriesNav(page);
-  await expect(nav.getByRole("link", { name: "INFRA", exact: true })).toHaveAttribute(
+  await expect(nav.getByRole("link", { name: "OPS", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
   );
@@ -48,7 +48,7 @@ test("the category page marks the current category and lists only its posts", as
 
 test("the category list sits beside the sidebar instead of centered", async ({ page }) => {
   await page.setViewportSize({ width: 1400, height: 900 });
-  await page.goto("/posts/categories/infra/");
+  await page.goto("/posts/categories/ops/");
 
   const sidebarBox = (await page.getByTestId("sidebar").boundingBox())!;
   const navBox = (await categoriesNav(page).boundingBox())!;
@@ -65,7 +65,7 @@ test("a post page shows the category nav with its own category current", async (
   const article = page.getByRole("main").getByRole("article");
   await expect(nav).toBeVisible();
   await expect(article).toBeVisible();
-  await expect(nav.getByRole("link", { name: "INFRA", exact: true })).toHaveAttribute(
+  await expect(nav.getByRole("link", { name: "OPS", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
   );
@@ -74,16 +74,16 @@ test("a post page shows the category nav with its own category current", async (
 test("a post's category label links to its category page", async ({ page }) => {
   await page.goto("/posts/os-performance-bottleneck-diagnosis/");
 
-  const categoryLink = page.getByRole("article").getByRole("link", { name: "INFRA", exact: true });
-  await expect(categoryLink).toHaveAttribute("href", "/posts/categories/infra/");
+  const categoryLink = page.getByRole("article").getByRole("link", { name: "OPS", exact: true });
+  await expect(categoryLink).toHaveAttribute("href", "/posts/categories/ops/");
   await categoryLink.click();
-  await expect(page).toHaveURL(/\/posts\/categories\/infra\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("INFRA");
+  await expect(page).toHaveURL(/\/posts\/categories\/ops\/$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("OPS");
 });
 
 test("the category list stacks above the posts on a narrow screen", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 720 });
-  await page.goto("/posts/categories/infra/");
+  await page.goto("/posts/categories/ops/");
 
   const nav = categoriesNav(page);
   const firstPost = postRows(page).first();

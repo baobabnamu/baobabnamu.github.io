@@ -15,7 +15,7 @@ describe("hasTranslation", () => {
   });
 
   it("follows which categories actually exist", () => {
-    expect(hasTranslation("/posts/categories/infra/", "ko")).toBe(true);
+    expect(hasTranslation("/posts/categories/ops/", "ko")).toBe(true);
     expect(hasTranslation("/posts/categories/does-not-exist/", "ko")).toBe(false);
   });
 

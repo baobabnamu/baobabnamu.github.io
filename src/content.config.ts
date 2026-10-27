@@ -14,7 +14,7 @@ const postSchema = z.object({
   headline: z.string(),
   subHeadline: z.string(),
   excerpt: z.string(),
-  category: z.string().default("unsorted"),
+  category: z.enum(["OPS", "DEV", "AI"]),
   publishDate: z.date(),
   lastModifiedDate: z.date().optional(),
 });
