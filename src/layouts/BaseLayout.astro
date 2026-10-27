@@ -77,10 +77,7 @@ const homeUrl = translatePath('/');
 			/>
 		</div>
 		<script>
-			import { startFaviconBlink } from '@/utils/favicon';
 			import { getTheme, themeStorageKey, toggleTheme } from '@/utils/theme';
-
-			startFaviconBlink();
 
 			const toggle = document.querySelector<HTMLButtonElement>('[data-test="theme-toggle"]');
 
