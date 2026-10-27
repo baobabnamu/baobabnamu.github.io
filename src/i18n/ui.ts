@@ -27,7 +27,7 @@ const ko = {
   "nav.home": "Home",
   "nav.posts": "Posts",
   "nav.portfolio": "Portfolio",
-  "nav.about": "About",
+  "nav.about": "Introduce",
   "home.postsByCategory": "Posts by Category",
   "home.more": "… {count}개 더",
   "posts.title": "POSTS",

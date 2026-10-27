@@ -11,16 +11,23 @@ const content = {
 	kicker: 'INTRODUCE',
 	title: '목적에 맞는 기술을 선택할 수 있는 엔지니어의 기록.',
 	description: `${brand.name} 소개 — 서버/인프라 관점에서 쓰는 실무 기록.`,
-	intro: '겉으로 그럴싸해 보이는 해결책보다, 실제로 측정하고 검증한 결과를 남기는 걸 우선합니다. OS·네트워크·성능 튜닝처럼 겉으로 잘 드러나지 않지만 서비스를 떠받치는 부분을 기록합니다.',
+	intro: [
+		'안녕하세요, Bao입니다 :)',
+		'겉으로 그럴싸해 보이는 해결책보다, 실제로 측정하고 검증한 결과를 남기는 걸 우선합니다.',
+		'인프라뿐만 아니라 개발, AI, 보안 등 다양한 분야에 대해 거리낌 없이 빠르게 학습합니다.',
+		'잠시 시간이 더 걸릴지언정 꾸준한 개선이 결국에는 팀의 전체 업무 시간을 덜 걸리게 만든다고 믿습니다.',
+	],
 };
 ---
 
 <BaseLayout title={`${brand.name} — ${content.kicker}`} description={content.description}>
 	<main class="px-4 pb-12 pt-6">
-		<div class="max-w-4xl">
+		<div class="max-w-5xl">
 			<p class="label">{content.kicker}</p>
 			<h1 class="mt-4 max-w-3xl text-4xl leading-[0.98] tracking-[-0.045em] sm:text-5xl md:text-6xl">{content.title}</h1>
-			<p class="mt-8 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">{content.intro}</p>
+			<div class="mt-8 max-w-5xl space-y-3 text-lg leading-relaxed text-muted md:text-xl">
+				{content.intro.map((line) => <p>{line}</p>)}
+			</div>
 		</div>
 	</main>
 </BaseLayout>
