@@ -352,9 +352,75 @@ html[data-theme="dark"] {
     --pele-series-8: color-mix(in srgb, var(--color-accent) 85%, var(--color-paper));
   }
 
+  /*
+   * Print. Being printable (Ctrl/Cmd-P "works") and being pleasant to read on
+   * paper are different problems — this fixes the second one: screen-sized
+   * type is too large on paper, chrome (nav/footer) doesn't belong on a
+   * printed page, and low-contrast colored links disappear on a B&W printer.
+   */
+
+  /* Hidden on screen; shown only in print (e.g. a short print-only byline
+     that gives a printed page its source once it's out of browser context). */
+  .onlyPrint {
+    display: none;
+  }
+
   @media print {
+    /* Site chrome — navigation, theme toggle, footer — isn't reading
+       content and has no reason to cost the reader paper and ink. */
+    .noPrint {
+      display: none !important;
+    }
+
+    .onlyPrint {
+      display: inline;
+    }
+
+    /* Screen type scales fluidly with viewport width; on paper that reads
+       oversized. Fixed point sizes instead, scoped to actual article content. */
+    .prose,
+    .prose p,
+    .prose ol,
+    .prose ul {
+      font-size: 12pt;
+    }
+
+    .prose h3,
+    .prose h4 {
+      font-size: 13pt;
+    }
+
+    .prose h2 {
+      font-size: 14pt;
+    }
+
+    article > header h1 {
+      font-size: 16pt;
+    }
+
+    /* The accent/muted link colors are low-contrast by design on screen;
+       on a B&W printer they fade to near-invisible gray. */
+    a {
+      color: black !important;
+    }
+
     .prose .mermaid-figure {
       break-inside: avoid;
+    }
+
+    /* Code blocks (Expressive Code's `.expressive-code` wrapper). Syntax
+       colors are mostly lost on a B&W printer, and the block stays one
+       solid unit rather than reflowing — `break-inside: avoid` keeps a
+       block from splitting mid-line across a page boundary (it starts a
+       fresh page instead), which is the realistic best-effort fix here.
+       It does NOT make an individual block that's taller than a full page
+       break cleanly — that would need per-line page-break awareness
+       Expressive Code doesn't expose, so a very long block still just
+       overflows the page in that case. */
+    .expressive-code {
+      break-inside: avoid;
+      font-size: 11pt;
+      border: 3px solid black;
     }
   }
 }
