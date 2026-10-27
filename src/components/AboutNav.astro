@@ -1,0 +1,40 @@
+---
+// Mirrors CategoryNav's pattern (same "sidebar list, current item marked"
+// shape as the Posts > Categories > <category> hierarchy), but for About's
+// own sub-pages. Only three entries today, so no preview/overflow handling
+// is needed — if that changes, revisit alongside CategoryList/CategoryNav.
+
+interface AboutSection {
+  id: string;
+  name: string;
+  href: string;
+}
+
+interface Props {
+  sections: AboutSection[];
+  /** The section of the page being viewed; marked as the current one. */
+  active: string;
+}
+
+const { sections, active } = Astro.props;
+---
+
+<nav aria-label="About" class="mb-6 w-fit whitespace-nowrap md:mb-0">
+  <p class="label">About</p>
+  <ul class="mt-3 list-none space-y-1" role="list">
+    {
+      sections.map((section) => (
+        <li>
+          <a
+            href={section.href}
+            aria-current={section.id === active ? "page" : undefined}
+            aria-label={section.id === active ? section.name : undefined}
+            class={section.id === active ? "tui-active text-accent" : undefined}
+          >
+            {section.name}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

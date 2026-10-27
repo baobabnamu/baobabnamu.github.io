@@ -30,6 +30,12 @@ const site = resolveSite(process.env.PUBLIC_SITE_URL) ?? resolveSite(process.env
 export default defineConfig({
   base,
   site,
+  // /portfolio used to be its own top-level page; it's now the Project
+  // sub-page under About (see src/pages/about/*). Keep the old URL alive
+  // for anything that already links to it.
+  redirects: {
+    "/portfolio": "/about/project",
+  },
   markdown: {
     // MDX inherits this processor, so the mermaid plugin covers every entry.
     processor: satteri({ mdastPlugins: [mermaid] }),

@@ -26,7 +26,6 @@ export const languageShortNames = {
 const ko = {
   "nav.home": "Home",
   "nav.posts": "Posts",
-  "nav.portfolio": "Portfolio",
   "nav.about": "About Me",
   "home.postsByCategory": "Posts by Category",
   "home.more": "… {count}개 더",

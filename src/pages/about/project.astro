@@ -1,5 +1,7 @@
 ---
+import AboutNav from '@/components/AboutNav.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import { aboutSections } from '@/utils/aboutSections';
 import { getEntry } from 'astro:content';
 
 const config = await getEntry('config', 'site');
@@ -8,19 +10,22 @@ if (!config) throw new Error('Missing "site" entry in the config collection.');
 const { brand } = config.data;
 
 const content = {
-	kicker: 'PORTFOLIO',
+	kicker: 'PROJECT',
 	title: '준비 중입니다.',
-	description: `${brand.name} 포트폴리오 — 준비 중입니다.`,
+	description: `${brand.name} 프로젝트 — 준비 중입니다.`,
 	body: '대표 프로젝트를 정리하는 중입니다. 곧 이 페이지에서 확인하실 수 있습니다.',
 };
 ---
 
 <BaseLayout title={`${brand.name} — ${content.kicker}`} description={content.description}>
 	<main class="px-4 pb-12 pt-6">
-		<div class="max-w-4xl">
-			<p class="label">{content.kicker}</p>
-			<h1 class="mt-4 max-w-3xl text-4xl leading-[0.98] tracking-[-0.045em] sm:text-5xl md:text-6xl">{content.title}</h1>
-			<p class="mt-8 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">{content.body}</p>
+		<div class="md:flex md:gap-8">
+			<AboutNav sections={aboutSections} active="project" />
+			<div class="md:min-w-0 md:flex-1">
+				<p class="label">{content.kicker}</p>
+				<h1 class="mt-4 max-w-3xl text-4xl leading-[0.98] tracking-[-0.045em] sm:text-5xl md:text-6xl">{content.title}</h1>
+				<p class="mt-8 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">{content.body}</p>
+			</div>
 		</div>
 	</main>
 </BaseLayout>
