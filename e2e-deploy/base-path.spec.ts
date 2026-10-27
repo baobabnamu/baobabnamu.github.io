@@ -48,5 +48,5 @@ test("following an internal link keeps the visitor inside the sub-path", async (
   await page.getByRole("navigation").getByRole("link", { name: "Posts" }).click();
 
   await expect(page).toHaveURL(new RegExp(`${BASE}/posts/?$`));
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("글");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("POSTS");
 });

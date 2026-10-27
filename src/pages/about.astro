@@ -1,37 +1,17 @@
 ---
-import { defaultLang } from '@/i18n/ui';
-import { useTranslatedPath } from '@/i18n/utils';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getEntry } from 'astro:content';
 
 const config = await getEntry('config', 'site');
 if (!config) throw new Error('Missing "site" entry in the config collection.');
 
-const lang = defaultLang;
-const translatePath = useTranslatedPath(lang);
 const { brand } = config.data;
 
 const content = {
-	kicker: '소개 / 01',
+	kicker: 'INTRODUCE',
 	title: '목적에 맞는 기술을 선택할 수 있는 엔지니어의 기록.',
 	description: `${brand.name} 소개 — 서버/인프라 관점에서 쓰는 실무 기록.`,
 	intro: '겉으로 그럴싸해 보이는 해결책보다, 실제로 측정하고 검증한 결과를 남기는 걸 우선합니다. OS·네트워크·성능 튜닝처럼 겉으로 잘 드러나지 않지만 서비스를 떠받치는 부분을 기록합니다.',
-	purpose: {
-		label: '목적',
-		title: '재사용 가능한 것만 남긴다.',
-		body: '다시 꺼내 쓸 수 있는 패턴, 이름 붙일 가치가 있는 트레이드오프, 실제로 겪어봐야 알 수 있는 교훈을 기록합니다.',
-	},
-	approach: {
-		label: '태도',
-		title: '그럴싸함보다 구체성.',
-		body: '모든 글은 실제로 겪은 문제에서 출발합니다. 분명한 예시와 평이한 언어, 그리고 이 아이디어가 지금 내 상황에 맞는지 판단할 수 있을 만큼의 맥락을 담으려 합니다.',
-	},
-	archive: {
-		label: '아카이브',
-		title: '지금 당면한 문제를 기준으로 둘러보세요.',
-		body: '인터페이스보다는 엔지니어링 실무, 그리고 그 뒤에 있는 사람의 판단에 더 가깝습니다. 천천히 읽고, 필요할 때 다시 찾아보고, 실제로 써먹는 걸 목표로 합니다.',
-		link: '아카이브 보기',
-	},
 };
 ---
 
@@ -41,15 +21,6 @@ const content = {
 			<p class="label">{content.kicker}</p>
 			<h1 class="mt-4 max-w-3xl text-4xl leading-[0.98] tracking-[-0.045em] sm:text-5xl md:text-6xl">{content.title}</h1>
 			<p class="mt-8 max-w-2xl text-lg leading-relaxed text-muted md:text-xl">{content.intro}</p>
-
-			<section class="mt-12 grid gap-x-12 gap-y-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]" aria-label={content.kicker}>
-				<article class="border-t border-line pt-4"><p class="label">{content.purpose.label}</p><h2 class="mt-3 text-2xl">{content.purpose.title}</h2><p class="mt-4 max-w-prose leading-relaxed text-muted">{content.purpose.body}</p></article>
-				<article class="border-t border-line pt-4"><p class="label">{content.approach.label}</p><h2 class="mt-3 text-2xl">{content.approach.title}</h2><p class="mt-4 max-w-prose leading-relaxed text-muted">{content.approach.body}</p></article>
-				<article class="border-t border-line pt-4 md:col-span-2">
-					<p class="label">{content.archive.label}</p>
-					<div class="mt-3 flex flex-wrap items-end justify-between gap-5"><div class="max-w-xl"><h2 class="text-2xl">{content.archive.title}</h2><p class="mt-4 leading-relaxed text-muted">{content.archive.body}</p></div><a class="label shrink-0 text-ink" href={`${translatePath('/posts')}/`}>{content.archive.link} <span aria-hidden="true">↗</span></a></div>
-				</article>
-			</section>
 		</div>
 	</main>
 </BaseLayout>

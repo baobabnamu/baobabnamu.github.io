@@ -12,7 +12,7 @@ test("the root path renders directly — no redirect to a language subpath", asy
 });
 
 test("the page is stamped with the Korean lang attribute", async ({ page }) => {
-  for (const path of ["/", "/posts/", "/notes/", "/about/"]) {
+  for (const path of ["/", "/posts/", "/portfolio/", "/about/"]) {
     await page.goto(path);
     await expect(page.locator("html")).toHaveAttribute("lang", "ko");
   }
@@ -29,9 +29,9 @@ test("navigation renders in English with clean, unprefixed URLs", async ({ page 
     "href",
     "/posts",
   );
-  await expect(page.getByRole("link", { name: "Notes", exact: true })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Portfolio", exact: true })).toHaveAttribute(
     "href",
-    "/notes",
+    "/portfolio",
   );
 });
 
