@@ -18,15 +18,18 @@ test("the page is stamped with the Korean lang attribute", async ({ page }) => {
   }
 });
 
-test("navigation renders in Korean with clean, unprefixed URLs", async ({ page }) => {
+test("navigation renders in English with clean, unprefixed URLs", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("link", { name: "홈", exact: true })).toHaveAttribute("href", "/");
-  await expect(page.getByRole("link", { name: "글", exact: true })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Home", exact: true })).toHaveAttribute(
+    "href",
+    "/",
+  );
+  await expect(page.getByRole("link", { name: "Posts", exact: true })).toHaveAttribute(
     "href",
     "/posts",
   );
-  await expect(page.getByRole("link", { name: "메모", exact: true })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Notes", exact: true })).toHaveAttribute(
     "href",
     "/notes",
   );

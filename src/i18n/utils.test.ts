@@ -61,8 +61,8 @@ describe("getPathFromUrl", () => {
 });
 
 describe("useTranslations", () => {
-  it("returns the Korean string for a known key", () => {
-    expect(useTranslations("ko")("nav.home")).toBe("홈");
+  it("returns the dictionary string for a known key", () => {
+    expect(useTranslations("ko")("nav.home")).toBe("Home");
   });
 
   it("falls back to the key when it is absent from the dictionary", () => {

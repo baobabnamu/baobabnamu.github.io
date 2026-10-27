@@ -38,8 +38,8 @@ describe("HeadSeo", () => {
     const html = await renderHeadSeo({
       title: "About",
     });
-    expect(html).toContain("<title>About · Bao의 기술 블로그</title>");
-    expect(html).toContain('<meta property="og:site_name" content="Bao의 기술 블로그"');
+    expect(html).toContain("<title>About · Bao&#39;s Tech Note</title>");
+    expect(html).toContain('<meta property="og:site_name" content="Bao\'s Tech Note"');
     // Description should fall back to the site config value, not be empty
     expect(html).toMatch(/<meta name="description" content=".+"/);
   });

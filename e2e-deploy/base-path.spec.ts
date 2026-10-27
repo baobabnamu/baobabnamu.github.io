@@ -11,7 +11,7 @@ test("the site renders from its deployment sub-path", async ({ page }) => {
 
   expect(response?.status()).toBe(200);
   await expect(page.locator("html")).toHaveAttribute("lang", "ko");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Bao의 기술 블로그");
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Bao's Tech Note");
 });
 
 test("every internal link accounts for the sub-path", async ({ page }) => {
@@ -45,7 +45,7 @@ test("a post page stays inside the sub-path", async ({ page }) => {
 test("following an internal link keeps the visitor inside the sub-path", async ({ page }) => {
   await page.goto(`${BASE}/`);
 
-  await page.getByRole("navigation").getByRole("link", { name: "글" }).click();
+  await page.getByRole("navigation").getByRole("link", { name: "Posts" }).click();
 
   await expect(page).toHaveURL(new RegExp(`${BASE}/posts/?$`));
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("글");
