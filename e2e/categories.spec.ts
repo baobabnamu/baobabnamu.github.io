@@ -6,7 +6,7 @@ import { expect, test, type Page } from "@playwright/test";
 // checks that still hold with a single category.
 
 const categoriesNav = (page: Page) =>
-  page.getByRole("main").getByRole("navigation", { name: "카테고리" });
+  page.getByRole("main").getByRole("navigation", { name: "Categories" });
 
 const postRows = (page: Page) =>
   page
@@ -23,16 +23,16 @@ test("home category heading links into that category's page", async ({ page }) =
 
   await link.click();
   await expect(page).toHaveURL(/\/posts\/categories\/infra\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("infra");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("INFRA");
 });
 
 test("the category page marks the current category and lists only its posts", async ({ page }) => {
   await page.goto("/posts/categories/infra/");
 
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("infra");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("INFRA");
 
   const nav = categoriesNav(page);
-  await expect(nav.getByRole("link", { name: "infra", exact: true })).toHaveAttribute(
+  await expect(nav.getByRole("link", { name: "INFRA", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
   );
@@ -65,7 +65,7 @@ test("a post page shows the category nav with its own category current", async (
   const article = page.getByRole("main").getByRole("article");
   await expect(nav).toBeVisible();
   await expect(article).toBeVisible();
-  await expect(nav.getByRole("link", { name: "infra", exact: true })).toHaveAttribute(
+  await expect(nav.getByRole("link", { name: "INFRA", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
   );
@@ -74,11 +74,11 @@ test("a post page shows the category nav with its own category current", async (
 test("a post's category label links to its category page", async ({ page }) => {
   await page.goto("/posts/os-performance-bottleneck-diagnosis/");
 
-  const categoryLink = page.getByRole("article").getByRole("link", { name: "infra", exact: true });
+  const categoryLink = page.getByRole("article").getByRole("link", { name: "INFRA", exact: true });
   await expect(categoryLink).toHaveAttribute("href", "/posts/categories/infra/");
   await categoryLink.click();
   await expect(page).toHaveURL(/\/posts\/categories\/infra\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("infra");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("INFRA");
 });
 
 test("the category list stacks above the posts on a narrow screen", async ({ page }) => {

@@ -20,7 +20,7 @@ test("home groups posts under their category heading", async ({ page }) => {
   await page.goto("/");
 
   const heading = page.getByRole("main").getByRole("heading", { level: 3 }).first();
-  await expect(heading).toContainText("infra");
+  await expect(heading).toContainText("INFRA");
   await expect(heading.getByRole("link")).toHaveAttribute(
     "href",
     "/posts/categories/infra/",

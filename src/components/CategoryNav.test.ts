@@ -11,7 +11,7 @@ describe("CategoryNav", () => {
   it("renders a nav landmark labelled after the categories title", async () => {
     const html = await renderNav(["CSS"]);
 
-    expect(html).toMatch(/<nav\b[^>]*aria-label="카테고리"/);
+    expect(html).toMatch(/<nav\b[^>]*aria-label="Categories"/);
   });
 
   it("renders one link per category, each pointing at its own page", async () => {
@@ -50,7 +50,7 @@ describe("CategoryNav", () => {
 
     // Summary states the hidden count.
     const summary = html.match(/<summary\b[^>]*>([\s\S]*?)<\/summary>/)?.[1] ?? "";
-    expect(summary).toContain("2개 더");
+    expect(summary).toContain("2 more");
   });
 
   it("keeps the preview categories out of the disclosure and the rest inside", async () => {
