@@ -225,7 +225,7 @@ html[data-theme="dark"] {
    * column while the rest of the site stays terse.
    */
   .prose {
-    max-width: 68ch;
+    max-width: 90ch;
     font-size: 1.0625rem;
     line-height: 1.7;
   }

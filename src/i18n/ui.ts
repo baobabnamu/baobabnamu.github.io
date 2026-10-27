@@ -24,10 +24,10 @@ export const languageShortNames = {
 } as const satisfies Record<keyof typeof languages, string>;
 
 const ko = {
-  "nav.home": "홈",
-  "nav.posts": "글",
-  "nav.notes": "메모",
-  "nav.about": "소개",
+  "nav.home": "Home",
+  "nav.posts": "Posts",
+  "nav.notes": "Notes",
+  "nav.about": "About",
   "home.postsByCategory": "카테고리별 글",
   "home.more": "… {count}개 더",
   "posts.title": "글",
