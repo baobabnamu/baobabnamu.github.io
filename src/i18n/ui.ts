@@ -38,7 +38,7 @@ const ko = {
   "categories.less": "… less",
   "common.back": "[ 뒤로 ]",
   "common.top": "[ 위로 ]",
-  "footer.links": "연결:",
+  "footer.links": "LINK:",
   "language.select": "언어를 선택하세요",
   "language.unavailable": "이 언어로는 제공되지 않습니다",
   "notfound.kicker": "오류 404 · 이 호에는 없음",
