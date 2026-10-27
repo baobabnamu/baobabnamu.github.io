@@ -32,7 +32,7 @@ const translatePath = useTranslatedPath(lang);
 
 <BaseLayout title={headline} description={excerpt} type="article">
   <main class="px-4 pt-6 pb-12">
-    <div class="md:flex md:gap-8">
+    <div class="md:flex md:gap-8" data-test="post-layout">
       <div class="hidden md:block">
         <CategoryNav categories={categories} lang={lang} active={category} />
       </div>
@@ -48,11 +48,40 @@ const translatePath = useTranslatedPath(lang);
               {brand.name} — {Astro.url.host}
             </p>
           </header>
-          <div class="prose mt-8">
-            <Content components={{ Mermaid }} />
+          <div class="mt-8 md:flex md:items-start md:gap-6" data-test="prose-footnote-row">
+            <div class="prose md:min-w-0">
+              <Content components={{ Mermaid }} />
+            </div>
           </div>
         </article>
       </div>
     </div>
   </main>
 </BaseLayout>
+
+<script>
+  // Footnotes render inline at the end of .prose. Move the generated section
+  // out to sit directly beside .prose (same flex row, not the outer
+  // CategoryNav/article row — that left a wide gap between the 90ch-capped
+  // text and the panel) and turn it into a <details> so it's collapsible —
+  // same idea as before the Print migration, just moved via JS instead of a
+  // CSS grid-row trick (that one caused a real layout bug last time; this
+  // is plain flexbox, nothing to get wrong).
+  const row = document.querySelector('[data-test="prose-footnote-row"]');
+  const section = document.querySelector('section[data-footnotes]');
+  const list = section?.querySelector('ol');
+  const heading = section?.querySelector('h2');
+
+  if (row && section && list && heading) {
+    const details = document.createElement('details');
+    details.className = 'footnote-panel';
+    details.open = true;
+
+    const summary = document.createElement('summary');
+    summary.textContent = heading.textContent || 'Footnotes';
+
+    details.append(summary, list);
+    section.remove();
+    row.append(details);
+  }
+</script>

@@ -353,6 +353,64 @@ html[data-theme="dark"] {
   }
 
   /*
+   * Footnotes. remark-gfm/Satteri render these as a <section data-footnotes>
+   * at the end of .prose; a small inline script on the post page moves that
+   * section out to sit beside the article (see [...slug].astro) and wraps
+   * it in a native <details> so it's collapsible without any JS framework.
+   * This only styles the result — collapsed by default below `md`, a
+   * sticky side column from `md` up, matching the site's existing hairline/
+   * monospace-label language instead of introducing a new visual motif.
+   */
+  .footnote-panel {
+    margin-top: 2rem;
+  }
+
+  .footnote-panel summary {
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .footnote-panel ol {
+    margin-top: 0.75rem;
+    padding-left: 1.2em;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    list-style: revert;
+  }
+
+  .footnote-panel li + li {
+    margin-top: 0.75em;
+  }
+
+  .footnote-panel a {
+    text-decoration: underline;
+    text-decoration-color: var(--color-accent);
+    text-underline-offset: 2px;
+  }
+
+  @media (min-width: 48rem) {
+    .footnote-panel {
+      flex: none;
+      width: 15rem;
+      margin-top: 0;
+      /* The row's own gap (see [...slug].astro's gap-6) already separates
+         this from .prose — this is just the small gutter between the rule
+         and the footnote text, not the main separation. */
+      padding-left: 1rem;
+      border-left: 1px solid var(--color-line);
+      position: sticky;
+      top: 1.25rem;
+      align-self: start;
+      max-height: calc(100vh - 2.5rem);
+      overflow-y: auto;
+    }
+  }
+
+  /*
    * Print. Being printable (Ctrl/Cmd-P "works") and being pleasant to read on
    * paper are different problems — this fixes the second one: screen-sized
    * type is too large on paper, chrome (nav/footer) doesn't belong on a
@@ -421,6 +479,28 @@ html[data-theme="dark"] {
       break-inside: avoid;
       font-size: 11pt;
       border: 3px solid black;
+    }
+
+    /* The footnote definitions are worth keeping on a printed page (they're
+       the glossary for the jargon in the body) — just not as a sticky side
+       column, which means nothing on paper. Print them as a normal,
+       already-expanded block instead. */
+    .footnote-panel {
+      position: static;
+      width: auto;
+      max-height: none;
+      overflow: visible;
+      border-left: none;
+      padding-left: 0;
+      font-size: 10pt;
+      break-inside: avoid;
+    }
+
+    /* Print the definitions even if the reader had collapsed the panel on
+       screen before hitting print — <details>'s native collapse otherwise
+       hides them from the printed page too. */
+    .footnote-panel:not([open]) > :not(summary) {
+      display: block !important;
     }
   }
 }
