@@ -1,6 +1,6 @@
 ---
 isDraft: false
-headline: "피크 트래픽에 뻗은 리버스 프록시 — CPU·네트워크 스택 튜닝 발표 자료"
+headline: "인프라 스터디(10월3주차) - CPU·네트워크 스택 튜닝 사례 학습"
 subHeadline: "애플리케이션이 아니라 OS/네트워크 스택을 의심해야 했던, 서버 엔지니어 관점의 504 장애 진단기"
 excerpt: "라이브 프로모션 트래픽 급증으로 발생한 Nginx 504 장애를 CPU governor, IRQ 분산, NIC 큐, TCP 스택 레벨에서 되짚은 케이스 스터디"
 category: "INFRA"
