@@ -6,7 +6,9 @@ Bao의 기술 블로그. [Print](https://github.com/riceball-tw/print) 테마를
 
 ## 글 작성 흐름
 
-1. `/drafts/`에서 markdown으로 초안 작성 (이 폴더는 git에 올라가지 않습니다).
+1. `templates/post/index.md`를 `/drafts/<slug>/index.md`로 복사해 초안 작성
+   (`/drafts/`는 git에 올라가지 않습니다). 주제와 상관없이 제목 단계·서식은 이 템플릿을
+   따릅니다 — 규칙은 `AGENTS.md`의 "Writing posts" 참고.
 2. 완성되면 `src/content/post/ko/<slug>/index.md`로 옮깁니다.
 3. frontmatter를 채우고 커밋/푸시하면 Test → Deploy 워크플로가 순서대로 돌아
    GitHub Pages에 배포합니다.
@@ -19,7 +21,7 @@ isDraft: false
 headline: "글 제목"
 subHeadline: "부제목 — 한 줄 요약"
 excerpt: "목록/SEO용 짧은 설명"
-category: "infra"
+category: "OPS" # OPS | DEV | AI
 publishDate: 2026-01-01
 ---
 ```
