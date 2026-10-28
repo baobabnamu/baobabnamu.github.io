@@ -193,12 +193,16 @@ function renderTable(children) {
 // convention (documented on the Notion "Blog" page) stores each one as a
 // top-level toggle block whose title is exactly "[^key]". These never render
 // inline; they're collected here and emitted as trailing `[^key]: ...`
-// footnote definitions instead.
+// footnote definitions instead. A toggle anywhere else (nested inside a
+// footnote or a list item) is a plain progressive-disclosure fold and comes
+// out as a raw <details><summary> block — Satteri passes raw HTML through
+// untouched, and nesting falls out for free since each fold is just a
+// normal element in the tree.
 const FOOTNOTE_TOGGLE = /^\[\^([^\]]+)\]$/;
 
 const LIST_ITEM_TYPES = new Set(["bulleted_list_item", "numbered_list_item"]);
 
-async function renderBlocks(blocks, footnotes) {
+async function renderBlocks(blocks, footnotes, isTopLevel = false) {
   // Markdown list items render as a "tight" list (no extra spacing) only when
   // they aren't separated by blank lines, so consecutive list-item blocks are
   // joined with a single newline; everything else keeps a blank line between.
@@ -251,12 +255,17 @@ async function renderBlocks(blocks, footnotes) {
       }
       case "toggle": {
         const title = renderInline(block.toggle.rich_text).trim();
-        const match = title.match(FOOTNOTE_TOGGLE);
-        if (!match) {
-          throw new Error(`"${title}" 형태가 아닌 토글 블록은 지원하지 않음 (각주 전용)`);
+        if (isTopLevel) {
+          const match = title.match(FOOTNOTE_TOGGLE);
+          if (!match) {
+            throw new Error(`최상위 토글은 각주([^key]) 전용인데 "${title}" 형태가 아님`);
+          }
+          footnotes.set(match[1], await renderBlocks(children, footnotes));
+          continue;
         }
-        footnotes.set(match[1], await renderBlocks(children, footnotes));
-        continue;
+        const nested = await renderBlocks(children, footnotes);
+        parts.push(`<details>\n<summary>${title}</summary>\n\n${nested}\n\n</details>`);
+        break;
       }
       default:
         throw new Error(`지원하지 않는 블록 타입: ${block.type}`);
@@ -288,7 +297,7 @@ async function convertPage(page) {
 
   const footnotes = new Map();
   const topLevelBlocks = await listAllChildren(page.id);
-  const body = await renderBlocks(topLevelBlocks, footnotes);
+  const body = await renderBlocks(topLevelBlocks, footnotes, true);
 
   const footnoteText = [...footnotes.entries()]
     .map(([key, markdown]) => renderFootnote(key, markdown))
