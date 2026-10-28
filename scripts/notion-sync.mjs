@@ -125,16 +125,27 @@ function mapCodeLanguage(language) {
   return normalized === "plain text" ? "text" : normalized;
 }
 
-function renderRichTextItem(item) {
-  let text = item.plain_text;
-  if (item.annotations.code) text = `\`${text}\``;
-  if (item.annotations.bold) text = `**${text}**`;
-  if (item.href) text = `[${text}](${item.href})`;
-  return text;
-}
-
+// Notion splits one visually-bold run into several rich-text items whenever a
+// code span or link sits inside it (one item per distinct annotation set).
+// Wrapping each item in its own "**...**" would butt two bold markers against
+// each other (e.g. "**foo****bar**"), which most Markdown parsers don't treat
+// as a single run. Instead, track whether a bold span is open and only emit
+// "**" at its start/end, regardless of how many items it spans.
 function renderInline(richText) {
-  return (richText ?? []).map(renderRichTextItem).join("").replace(/\n/g, " ");
+  let out = "";
+  let boldOpen = false;
+  for (const item of richText ?? []) {
+    if (item.annotations.bold !== boldOpen) {
+      out += "**";
+      boldOpen = item.annotations.bold;
+    }
+    let text = item.plain_text;
+    if (item.annotations.code) text = `\`${text}\``;
+    if (item.href) text = `[${text}](${item.href})`;
+    out += text;
+  }
+  if (boldOpen) out += "**";
+  return out.replace(/\n/g, " ");
 }
 
 function indent(markdown, prefix) {
@@ -162,7 +173,12 @@ function renderTable(children) {
 // footnote definitions instead.
 const FOOTNOTE_TOGGLE = /^\[\^([^\]]+)\]$/;
 
+const LIST_ITEM_TYPES = new Set(["bulleted_list_item", "numbered_list_item"]);
+
 async function renderBlocks(blocks, footnotes) {
+  // Markdown list items render as a "tight" list (no extra spacing) only when
+  // they aren't separated by blank lines, so consecutive list-item blocks are
+  // joined with a single newline; everything else keeps a blank line between.
   const parts = [];
   let numberedIndex = 0;
 
@@ -217,14 +233,24 @@ async function renderBlocks(blocks, footnotes) {
           throw new Error(`"${title}" 형태가 아닌 토글 블록은 지원하지 않음 (각주 전용)`);
         }
         footnotes.set(match[1], await renderBlocks(children, footnotes));
-        break;
+        continue;
       }
       default:
         throw new Error(`지원하지 않는 블록 타입: ${block.type}`);
     }
+
+    parts[parts.length - 1] = {
+      text: parts[parts.length - 1],
+      isListItem: LIST_ITEM_TYPES.has(block.type),
+    };
   }
 
-  return parts.join("\n\n");
+  let out = "";
+  for (let i = 0; i < parts.length; i++) {
+    const separator = i > 0 && parts[i].isListItem && parts[i - 1].isListItem ? "\n" : "\n\n";
+    out += (i > 0 ? separator : "") + parts[i].text;
+  }
+  return out;
 }
 
 function renderFootnote(key, bodyMarkdown) {
