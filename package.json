@@ -15,7 +15,8 @@
     "lint:fix": "oxlint --fix",
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
-    "astro": "astro"
+    "astro": "astro",
+    "notion:sync": "node scripts/notion-sync.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-satteri": "0.4.3",
@@ -28,6 +29,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@notionhq/client": "^5.28.0",
     "@playwright/test": "^1.64.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^22.19.0",
