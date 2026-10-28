@@ -66,10 +66,32 @@ jobs:
 
       # A GITHUB_TOKEN push doesn't fire `on: push` (GitHub suppresses that to
       # avoid infinite loops), so Test → Deploy would never run on their own
-      # after the push above. Dispatching Test directly sidesteps that; Deploy
-      # still follows normally via its `workflow_run: [Test]` trigger.
-      - name: Trigger deploy
+      # after the push above. Dispatching Test directly sidesteps that — but
+      # Deploy's own `workflow_run: [Test]` trigger turned out to be
+      # unreliable for runs that were themselves started via workflow_dispatch
+      # (observed: fired once, silently didn't on an otherwise identical next
+      # run), so this waits for Test to finish and dispatches Deploy directly
+      # instead of trusting that event to arrive.
+      - name: Run Test, then Deploy if it passes
         if: steps.commit.outputs.pushed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run test.yml --repo "${{ github.repository }}" --ref main
+        run: |
+          before="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          gh workflow run test.yml --repo "${{ github.repository }}" --ref main
+
+          run_id=""
+          for _ in $(seq 1 30); do
+            run_id="$(gh run list --repo "${{ github.repository }}" --workflow=test.yml \
+              --json databaseId,createdAt,event \
+              -q "[.[] | select(.event == \"workflow_dispatch\" and .createdAt > \"$before\")] | .[0].databaseId")"
+            [ -n "$run_id" ] && [ "$run_id" != "null" ] && break
+            sleep 2
+          done
+          if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
+            echo "Could not find the dispatched Test run" >&2
+            exit 1
+          fi
+
+          gh run watch "$run_id" --repo "${{ github.repository }}" --exit-status
+          gh workflow run deploy.yml --repo "${{ github.repository }}" --ref main
