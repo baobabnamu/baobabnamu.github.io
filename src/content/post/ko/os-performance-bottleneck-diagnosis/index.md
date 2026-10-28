@@ -250,7 +250,7 @@ ethtool -K eth0 rx on tx on sg on tso on gso on gro on
 ethtool -C eth0 rx-usecs 50 tx-usecs 50
 ```
 
-```yaml
+```bash
 # /etc/sysctl.d/90-net.conf
 net.core.somaxconn = 4096
 net.ipv4.tcp_max_syn_backlog = 8192
