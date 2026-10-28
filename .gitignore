@@ -5,6 +5,9 @@ node_modules/
 dist/
 .astro/
 
+# === notion-sync incremental state (restored from GitHub Actions cache) ===
+.cache/
+
 # === Environment variables / secrets ===
 .env
 .env.*

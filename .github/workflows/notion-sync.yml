@@ -25,10 +25,27 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      # Lets the script skip Notion pages that haven't changed since the last
+      # run. Best-effort: a cache miss just makes this run scan every page,
+      # same as before this existed.
+      - name: Restore Notion sync state
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/notion-sync-state.json
+          key: notion-sync-state-${{ github.run_id }}
+          restore-keys: |
+            notion-sync-state-
+
       - name: Sync from Notion
         run: pnpm notion:sync
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+
+      - name: Save Notion sync state
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/notion-sync-state.json
+          key: notion-sync-state-${{ github.run_id }}
 
       - name: Commit and push if changed
         run: |

@@ -11,6 +11,11 @@ const DATA_SOURCE_ID =
   process.env.NOTION_POSTS_DATA_SOURCE_ID ?? "d7eb8e04-c2e1-4bd4-abf0-69f74da94079";
 const POSTS_DIR = path.join(process.cwd(), "src/content/post/ko");
 const CATEGORIES = new Set(["OPS", "DEV", "AI"]);
+// Not committed to the repo — the workflow restores/saves this via GitHub
+// Actions cache, which is best-effort. A cold cache just means this run falls
+// back to scanning every page, so losing it is a performance hit, not a
+// correctness issue.
+const STATE_FILE = path.join(process.cwd(), ".cache/notion-sync-state.json");
 
 const notion = new Client({ auth: requireEnv("NOTION_TOKEN") });
 
@@ -20,12 +25,30 @@ function requireEnv(name) {
   return value;
 }
 
-async function queryAllPages() {
+async function readState() {
+  try {
+    return JSON.parse(await readFile(STATE_FILE, "utf8"));
+  } catch (err) {
+    if (err.code === "ENOENT") return null;
+    throw err;
+  }
+}
+
+async function writeState(state) {
+  await mkdir(path.dirname(STATE_FILE), { recursive: true });
+  await writeFile(STATE_FILE, JSON.stringify(state), "utf8");
+}
+
+async function queryAllPages(since) {
   const pages = [];
   let cursor;
+  const filter = since
+    ? { timestamp: "last_edited_time", last_edited_time: { on_or_after: since } }
+    : undefined;
   do {
     const response = await notion.dataSources.query({
       data_source_id: DATA_SOURCE_ID,
+      filter,
       start_cursor: cursor,
       page_size: 100,
     });
@@ -294,7 +317,12 @@ async function writeIfChanged(slug, markdown) {
 }
 
 async function main() {
-  const pages = await queryAllPages();
+  // Captured before querying, so edits landing mid-run are still >= this
+  // timestamp and get picked up by the next run's filter.
+  const syncStartedAt = new Date().toISOString();
+  const state = await readState();
+
+  const pages = await queryAllPages(state?.lastSyncedAt);
   let changed = 0;
 
   for (const page of pages) {
@@ -309,7 +337,8 @@ async function main() {
     }
   }
 
-  console.log(`[notion-sync] done, ${changed} file(s) changed`);
+  await writeState({ lastSyncedAt: syncStartedAt });
+  console.log(`[notion-sync] checked ${pages.length} page(s), ${changed} file(s) changed`);
 }
 
 main().catch((err) => {
