@@ -52,6 +52,9 @@ const translatePath = useTranslatedPath(lang);
             <div class="prose md:min-w-0">
               <Content components={{ Mermaid }} />
             </div>
+            <details class="footnote-panel" open data-test="footnote-panel">
+              <summary>Footnotes</summary>
+            </details>
           </div>
         </article>
       </div>
@@ -60,28 +63,17 @@ const translatePath = useTranslatedPath(lang);
 </BaseLayout>
 
 <script>
-  // Footnotes render inline at the end of .prose. Move the generated section
-  // out to sit directly beside .prose (same flex row, not the outer
-  // CategoryNav/article row — that left a wide gap between the 90ch-capped
-  // text and the panel) and turn it into a <details> so it's collapsible —
-  // same idea as before the Print migration, just moved via JS instead of a
-  // CSS grid-row trick (that one caused a real layout bug last time; this
-  // is plain flexbox, nothing to get wrong).
-  const row = document.querySelector('[data-test="prose-footnote-row"]');
+  // Footnotes render inline at the end of .prose. The side panel itself is
+  // always rendered (empty when a post has no footnotes, so every post keeps
+  // the same layout); this moves the generated list into it, beside .prose
+  // in the same flex row, and drops the original section. Plain flexbox —
+  // the earlier CSS grid-row trick caused a real layout bug.
+  const panel = document.querySelector('[data-test="footnote-panel"]');
   const section = document.querySelector('section[data-footnotes]');
   const list = section?.querySelector('ol');
-  const heading = section?.querySelector('h2');
 
-  if (row && section && list && heading) {
-    const details = document.createElement('details');
-    details.className = 'footnote-panel';
-    details.open = true;
-
-    const summary = document.createElement('summary');
-    summary.textContent = heading.textContent || 'Footnotes';
-
-    details.append(summary, list);
+  if (panel && section && list) {
+    panel.append(list);
     section.remove();
-    row.append(details);
   }
 </script>

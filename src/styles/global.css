@@ -354,9 +354,10 @@ html[data-theme="dark"] {
 
   /*
    * Footnotes. remark-gfm/Satteri render these as a <section data-footnotes>
-   * at the end of .prose; a small inline script on the post page moves that
-   * section out to sit beside the article (see [...slug].astro) and wraps
-   * it in a native <details> so it's collapsible without any JS framework.
+   * at the end of .prose; a small inline script on the post page moves the
+   * list into the native <details> panel beside the article (see
+   * [...slug].astro). The panel is always present — empty when a post has
+   * no footnotes — so every post has the same layout.
    * This only styles the result — collapsed by default below `md`, a
    * sticky side column from `md` up, matching the site's existing hairline/
    * monospace-label language instead of introducing a new visual motif.
@@ -384,6 +385,18 @@ html[data-theme="dark"] {
 
   .footnote-panel li + li {
     margin-top: 0.75em;
+  }
+
+  /* Bullet lists inside a footnote definition (the preflight reset would
+     otherwise strip their markers). */
+  .footnote-panel li ul {
+    margin-top: 0.5em;
+    padding-left: 1.2em;
+    list-style: revert;
+  }
+
+  .footnote-panel li ul li + li {
+    margin-top: 0.35em;
   }
 
   .footnote-panel a {
@@ -501,6 +514,11 @@ html[data-theme="dark"] {
        hides them from the printed page too. */
     .footnote-panel:not([open]) > :not(summary) {
       display: block !important;
+    }
+
+    /* An empty panel is only there for on-screen layout consistency. */
+    .footnote-panel:not(:has(ol)) {
+      display: none;
     }
   }
 }
