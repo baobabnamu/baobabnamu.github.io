@@ -2,7 +2,7 @@
 isDraft: false
 headline: "CPU Load Average와 리눅스 CPU 스케줄러(CFS → EEVDF) 정리"
 subHeadline: "load average가 무엇을 세는지, 코어보다 태스크가 많을 때 커널이 CPU를 어떻게 나누는지"
-excerpt: "Load average의 개념과 집계 원리, 코어 수 초과 시 커널의 시분할 동작, 커널 6.6부터 CFS를 대체한 EEVDF와 OS별 적용 현황"
+excerpt: "Load average의 개념과 집계 원리, 코어 수 초과 시 커널의 시분할 동작, 커널 6.6부터 CFS를 대체한 EEVDF와 OS별 적용 현황 (sync 테스트)"
 category: "OPS"
 publishDate: 2026-10-28
 ---
