@@ -39,7 +39,7 @@ Client → ALB
 
 - 리버스 프록시 4대가 WAS 앞단에서 TLS 종료 + 라우팅을 담당
 - 평소 평균 동시 접속 2,000, 피크(라이브 프로모션 방송) 때 12,000까지 급증 예정이었음
-- 인스턴스는 생성된 지 오래된 AMI 기반이라 CPU governor가 기본값인
+- 인스턴스는 생성된 지 오래된 AMI 기반이라 CPU governor[^governor]가 기본값인
   `powersave`로 남아 있었고, `irqbalance`는 설치돼 있었지만 비활성 상태였다
   (이 두 가지가 원인이라는 건 이때는 아무도 몰랐다)
 
@@ -135,7 +135,7 @@ cat /proc/interrupts | grep eth0
 
 여러 NIC가 CPU0에 몰렸다는 뜻이 아니다. NIC(eth0)는 1개고, 문제는 그 NIC가
 **큐를 1개(`TxRx-0`)만 쓰고 있었다**는 점이다. NIC에 큐가 여러 개 있으면
-큐마다 별도 IRQ로 나뉘어 코어마다 하나씩 나눠 처리할 수 있는데(Receive
+큐마다 별도 IRQ[^irq]로 나뉘어 코어마다 하나씩 나눠 처리할 수 있는데(Receive
 Side Scaling, RSS), 큐가 1개뿐이면 그 NIC로 들어오는 모든 트래픽의 인터럽트가
 애초에 IRQ 45 하나로만 모인다. 거기에 `irqbalance`까지 꺼져 있어서 IRQ 45가
 CPU0 하나에만 고정 배정된 상태였고, 그 결과 이 NIC가 만드는 인터럽트 전부를
@@ -152,7 +152,7 @@ analyzing CPU 0:
   current CPU frequency: 1.35 GHz
 ```
 
-governor가 `powersave`라 평소엔 절전을 위해 낮은 주파수로
+governor가 `powersave`라 평소엔 절전을 위해 낮은 주파수[^frequency]로
 동작하다가, 트래픽이 급증한 순간에도 주파수가 즉시 따라 올라가지 못해 CPU0의
 인터럽트 처리가 더 쉽게 포화됐다.
 
@@ -180,7 +180,7 @@ Current hardware settings:
 RX:              256
 ```
 
-기본 RX ring buffer가 256으로, 트래픽 급증 구간에서 큐가
+기본 RX ring buffer[^ring-buffer]가 256으로, 트래픽 급증 구간에서 큐가
 순식간에 가득 차 `rx_dropped`가 18만 건 넘게 쌓였다.
 
 ```bash
@@ -191,7 +191,7 @@ dmesg -T | grep -i conntrack
 [Mon Oct 25 20:05:41] nf_conntrack: table full, dropping packet
 ```
 
-동시 접속이 급증하면서 conntrack 테이블까지 가득 찼고, 신규 연결 수립 자체가
+동시 접속이 급증하면서 conntrack[^conntrack] 테이블까지 가득 찼고, 신규 연결 수립 자체가
 커널 단에서 drop되고 있었다. 이 시나리오의 트래픽은 전부 HTTP(S), 즉 TCP
 연결이다 — 클라이언트가 새로 보내는 TCP SYN 패킷마다 conntrack이 항목을 새로
 만들어야 하는데, 표가 꽉 차 있으니 그 SYN 패킷 자체를 커널이 버린 것이다.
@@ -434,3 +434,23 @@ CPU governor/IRQ affinity, NIC ring buffer·오프로딩, conntrack/BBR 등
 측정 → 병목 특정 → 튜닝 → 검증 절차와 USE Method 틀을 참고했다.
 - Rocky Linux 9 서버 OS 튜닝 정리 자료 — sysctl 파라미터 적용 방식과
 Ansible 코드화 예시를 참고했다.
+
+[^governor]: 커널이 상황에 따라 CPU 클럭 속도를 자동으로 올리고 내리는 전력
+    관리 정책. `performance`(항상 최고 클럭), `powersave`(절전 우선) 등의
+    모드가 있다.
+[^frequency]: CPU가 1초에 처리하는 클럭 사이클 수. 높을수록 같은 시간에 더
+    많은 연산·인터럽트를 처리할 수 있다.
+[^irq]: Interrupt ReQuest(인터럽트 요청)의 줄임말. 하드웨어가 "이 작업 좀
+    지금 처리해달라"고 CPU에 보내는 신호다. NIC에 패킷이 도착할 때마다
+    IRQ가 발생하고, 커널은 그 IRQ를 특정 CPU 코어에 배정해 처리하게 한다 —
+    즉 어떤 IRQ가 어느 코어에 배정되느냐가 "어떤 코어가 이 하드웨어의
+    인터럽트를 처리하느냐"를 결정한다.
+[^ring-buffer]: NIC가 받은 패킷을 CPU가 처리하기 전까지 잠깐 담아두는
+    하드웨어 큐다. CPU가 인터럽트를 처리해 패킷을 꺼내가는 속도보다 패킷이
+    들어오는 속도가 빠르면 이 큐가 가득 차고, 그 이후 도착하는 패킷은 자리가
+    없어 그냥 버려진다 — 그게 `rx_dropped`다.
+[^conntrack]: 리눅스 커널이 지금 오가고 있는 모든 연결(connection)의 상태를
+    기록해두는 표다. NAT나 방화벽(iptables/nftables)이 "이 응답 패킷이 어느
+    연결에 대한 응답인지" 매칭하려면 이 표가 있어야 하고, 표에는 최대 항목
+    수(`nf_conntrack_max`) 제한이 있다. 동시 연결 수가 이 한도를 넘으면
+    커널이 새 연결 자체를 거부하는데, 그게 `table full, dropping packet`이다.
