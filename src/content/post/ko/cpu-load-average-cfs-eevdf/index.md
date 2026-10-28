@@ -10,12 +10,9 @@ publishDate: 2026-10-28
 ## 1. CPU Load Average — 개념과 원리
 
 - **개념**: load 1은 평균적으로 CPU를 원하는 태스크(스레드 단위)[^cpu-performance]가 1개 있다는 뜻이다.
-
 - **원리**: 리눅스 커널이 5초마다 아래 태스크 수를 세서 1분·5분·15분 평균을 낸다.
   - CPU를 점유하고 있는 태스크
-
   - 실행 큐에서 CPU를 기다리는 태스크
-
   - I/O 등을 기다리는 태스크
 
 **load는 프로세스가 아니라 스레드 단위로 센다.** 그래서 하나의 프로세스로 실행되더라도 내부적으로 멀티스레드로 동작하면 load 값이 높게 나온다.
@@ -36,7 +33,6 @@ top -H -p ${PID}    # 특정 프로세스의 스레드 보기
 리눅스의 시분할 스케줄러는 두 가지다.
 
 - **CFS** (Completely Fair Scheduler)
-
 - **EEVDF** (Earliest Eligible Virtual Deadline First)
 
 ## 3. CFS와 EEVDF 비교
@@ -50,7 +46,6 @@ top -H -p ${PID}    # 특정 프로세스의 스레드 보기
 EEVDF는 이름 그대로 두 단계로 다음 스레드를 고른다.
 
 1. **Eligible.** 자기 몫보다 CPU를 덜 받은 스레드만 후보로 선정한다.
-
 2. **Earliest Virtual Deadline.** 후보 중 가상 데드라인이 가장 빠른 스레드를 실행한다.
 
 CFS는 공정성 위주의 스케줄링이라 지연을 제어하려면 커널 파라미터 튜닝과 휴리스틱에 기대야 했다. EEVDF는 **스케줄러 자체에서 직접 후보를 선정하고 최적화하는 구조**로 이를 개선했다.
@@ -151,15 +146,12 @@ wrk -t2 -c50 -d60s --latency http://<테스트 VM IP>/
 ### 4-5. 기록 규칙
 
 - 시나리오마다 3번씩 돌리고 중간값을 기록한다.
-
 - 시나리오 사이에는 `pgrep stress-ng`로 이전 부하가 끝났는지 확인한다.
-
 - 두 VM은 같은 호스트에서, 다른 작업이 없는 시간에 돌린다.
 
 ## 마무리
 
 - load average는 CPU 사용률이 아니라 CPU를 원하는 태스크(스레드) 수의 평균이다.
-
 - load가 코어 수를 넘으면 커널은 시분할로 CPU를 나누고, 그 규칙이 커널 6.6부터 CFS에서 EEVDF로 바뀌었다.
 
 ---
@@ -167,7 +159,6 @@ wrk -t2 -c50 -d60s --latency http://<테스트 VM IP>/
 **참고자료**
 
 - [Linux Load Averages: Solving the Mystery](https://www.brendangregg.com/blog/2017-08-08/linux-load-averages.html) — load average가 세는 태스크 상태와 집계 방식을 참고했다.
-
 - [An EEVDF CPU scheduler for Linux (LWN)](https://lwn.net/Articles/925371/) — EEVDF의 eligible, 가상 데드라인 개념과 CFS 대비 변경점을 참고했다.
 
 [^cpu-performance]: load는 태스크의 "개수"만 셀 뿐, CPU가 그 태스크를 얼마나 빨리 처리하는지는 반영하지 않는다. 같은 작업이라도 빠른 CPU에서는 태스크가 금방 끝나 대기열에서 빨리 빠지므로 load가 낮게 유지되고, 느린 CPU에서는 오래 남아 load가 높아진다. 스케줄러도 태스크마다 "같은 양의 일"이 아니라 "같은 비율의 CPU 시간"을 나눠줄 뿐이다. 코어 성능은 클럭(GHz)만으로 정해지지 않고 클럭당 처리량(IPC)·캐시·아키텍처도 함께 좌우한다. 그래서 load는 같은 서버의 코어 수(`nproc`)와 비교할 때만 의미가 있고, CPU가 다른 서버끼리 load 숫자를 그대로 비교하면 안 된다.
@@ -180,19 +171,14 @@ wrk -t2 -c50 -d60s --latency http://<테스트 VM IP>/
     **2-1-1. OS 업데이트의 종류** — 범위가 큰 것부터 정리하면 다음과 같다.
 
     - **메이저 버전 업그레이드** (RHEL 9 → 10, Ubuntu 22.04 → 24.04): 커널 계열, glibc, 컴파일러 등 기반이 통째로 바뀐다. 지원 기간이 새로 시작되지만 위험도가 가장 커서 재설치나 전용 도구(`leapp`, `do-release-upgrade`)로 한다.
-
     - **마이너 버전 업데이트** (RHEL 9.4 → 9.5, Ubuntu 22.04.4 → 22.04.5): 그동안의 패치 묶음에 일부 기능과 하드웨어 지원이 더해진다. 커널 계열은 유지되고 평소처럼 `dnf update` / `apt upgrade`로 따라 올라간다.
-
     - **HWE 커널 전환** (Ubuntu만): OS는 그대로 두고 커널 계열만 올리는 선택 사항이다. RHEL에는 해당하는 개념이 없다.
-
     - **패치 업데이트** (RHEL 에라타, Ubuntu USN): 보안·버그 수정. 가장 자주 하는 업데이트이고, 커널 수정은 재부팅해야 반영된다.
-
     - **라이브 패치** (`kpatch`, Canonical Livepatch): 재부팅 없이 커널의 긴급 보안 수정만 적용한다. 다음 재부팅 때 정식 패치 커널로 바꿔야 한다.
 
     **2-1-1-1. RHEL 에라타와 Ubuntu USN** — 둘 다 패치를 배포할 때 붙이는 **공지(이름표)** 이고, 업데이트 방식이 따로 있는 것이 아니다. 실제 적용은 평소처럼 `dnf update` / `apt upgrade`로 한다.
 
     - **RHEL 에라타(Errata)**: Red Hat이 수정 패키지를 낼 때마다 발행하는 공지. 보안(RHSA), 버그(RHBA), 기능 개선(RHEA) 세 종류가 있고, 어떤 CVE를 고쳤는지, 어떤 패키지의 몇 버전에서 고쳐졌는지가 적혀 있다. Rocky는 RLSA, Alma는 ALSA라는 이름으로 같은 공지를 낸다.
-
     - **Ubuntu USN(Ubuntu Security Notice)**: Ubuntu의 보안 공지. `USN-XXXX-1` 형식이고, 영향받는 릴리스와 패키지, CVE, 수정 버전이 적혀 있다.
 
     공지 단위로 보면 "전부 업데이트" 대신 필요한 것만 골라 적용할 수 있다. 예를 들어 RHEL 계열은 `dnf updateinfo list --security`로 남은 보안 에라타를 보고 `dnf update --security`로 보안 수정만 적용한다. 같은 `dnf update` 한 번으로 패치 업데이트와 마이너 버전 업데이트가 함께 들어오므로, 둘은 명령어가 아니라 들어오는 내용으로 구분된다.
