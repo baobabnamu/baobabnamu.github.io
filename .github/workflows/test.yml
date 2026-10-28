@@ -3,6 +3,11 @@ name: Test
 on:
   push:
   pull_request:
+  # Dispatched by notion-sync.yml. A GITHUB_TOKEN push doesn't trigger `on:
+  # push` (GitHub suppresses that to avoid infinite loops), so the sync
+  # workflow calls this explicitly instead — which still lets Deploy's
+  # `workflow_run: [Test]` trigger fire normally afterward.
+  workflow_dispatch:
 
 jobs:
   test:

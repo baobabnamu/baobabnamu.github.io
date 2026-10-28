@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  # Needed to dispatch Test below.
+  actions: write
 
 jobs:
   sync:
@@ -48,13 +50,26 @@ jobs:
           key: notion-sync-state-${{ github.run_id }}
 
       - name: Commit and push if changed
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add src/content/post
           if git diff --cached --quiet; then
             echo "No content changes."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git commit -m "content: sync from Notion"
           git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # A GITHUB_TOKEN push doesn't fire `on: push` (GitHub suppresses that to
+      # avoid infinite loops), so Test → Deploy would never run on their own
+      # after the push above. Dispatching Test directly sidesteps that; Deploy
+      # still follows normally via its `workflow_run: [Test]` trigger.
+      - name: Trigger deploy
+        if: steps.commit.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run test.yml --repo "${{ github.repository }}" --ref main
