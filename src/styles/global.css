@@ -459,6 +459,19 @@ html[data-theme="dark"] {
   }
 
   /*
+   * Right where the panel first goes side-by-side (48rem), 15rem is as much
+   * as it can take without squeezing .prose uncomfortably narrow. Past 80rem
+   * there's room nothing else is using — widen it there, which also gives
+   * nested <details> folds (each level adds its own border/padding) more
+   * breathing room.
+   */
+  @media (min-width: 80rem) {
+    .footnote-panel {
+      width: 23rem;
+    }
+  }
+
+  /*
    * Print. Being printable (Ctrl/Cmd-P "works") and being pleasant to read on
    * paper are different problems — this fixes the second one: screen-sized
    * type is too large on paper, chrome (nav/footer) doesn't belong on a
