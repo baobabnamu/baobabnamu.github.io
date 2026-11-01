@@ -76,6 +76,41 @@ html[data-theme="dark"] {
     scroll-padding-top: calc(var(--navbar-height) + 1rem);
   }
 
+  /*
+   * Thin, palette-matched scrollbar instead of the OS default, for the page
+   * itself and every internal overflow container (.footnote-panel, .prose
+   * pre/.mermaid). scrollbar-color inherits, but scrollbar-width does not —
+   * both need the universal selector to reach elements other than <html>.
+   * Firefox and modern Chromium read these directly; WebKit (Safari, older
+   * Chromium) needs the pseudo-elements below instead.
+   */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-ink) 25%, transparent) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    /* The paper-colored border insets the thumb from the track, giving it a
+       slim floating look without rounding it — square corners match the
+       rest of the layout. */
+    border: 2px solid var(--color-paper);
+    background-color: color-mix(in srgb, var(--color-ink) 25%, transparent);
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--color-ink) 45%, transparent);
+  }
+
   body {
     margin: 0;
     min-height: 100vh;
