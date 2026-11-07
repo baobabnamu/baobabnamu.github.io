@@ -372,6 +372,14 @@ async function main() {
 
   const pages = await queryAllPages(state?.lastSyncedAt);
   let changed = 0;
+  // A page that fails to convert keeps its last_edited_time unchanged in
+  // Notion, so if the checkpoint advanced past it anyway, the next run's
+  // on_or_after filter would exclude it forever — it'd fail once and then
+  // silently vanish from every future sync. Capping the checkpoint at the
+  // oldest still-failing page's last_edited_time keeps retrying it on every
+  // run (along with anything edited since, redundant but harmless) until
+  // whatever's wrong with it is fixed.
+  let earliestFailure;
 
   for (const page of pages) {
     try {
@@ -382,10 +390,13 @@ async function main() {
       }
     } catch (err) {
       console.warn(`[notion-sync] skip page ${page.id}: ${err.message}`);
+      if (!earliestFailure || page.last_edited_time < earliestFailure) {
+        earliestFailure = page.last_edited_time;
+      }
     }
   }
 
-  await writeState({ lastSyncedAt: syncStartedAt });
+  await writeState({ lastSyncedAt: earliestFailure ?? syncStartedAt });
   console.log(`[notion-sync] checked ${pages.length} page(s), ${changed} file(s) changed`);
 }
 
