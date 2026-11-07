@@ -4,7 +4,7 @@
 // see AGENTS.md and the Notion "Blog" page for the property/block mapping rules.
 
 import { Client } from "@notionhq/client";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const DATA_SOURCE_ID =
@@ -178,6 +178,26 @@ function indent(markdown, prefix) {
     .join("\n");
 }
 
+// Notion-hosted ("file") images are served from signed URLs that expire in
+// about an hour, so committing the URL itself to the repo would go dead —
+// the bytes are downloaded once and committed alongside index.md instead.
+// Astro's content collections resolve and optimize relative image paths in
+// Markdown bodies automatically, no config needed. Skipping the download
+// when the file already exists keeps re-syncs idempotent (no spurious diffs
+// or repeat downloads for images that haven't changed).
+async function downloadImageIfMissing(url, destPath) {
+  const alreadyExists = await access(destPath)
+    .then(() => true)
+    .catch(() => false);
+  if (alreadyExists) return;
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`이미지 다운로드 실패 (${response.status}): ${url}`);
+  const buffer = Buffer.from(await response.arrayBuffer());
+  await mkdir(path.dirname(destPath), { recursive: true });
+  await writeFile(destPath, buffer);
+}
+
 function renderTable(children) {
   const rows = children
     .filter((child) => child.type === "table_row")
@@ -202,7 +222,7 @@ const FOOTNOTE_TOGGLE = /^\[\^([^\]]+)\]$/;
 
 const LIST_ITEM_TYPES = new Set(["bulleted_list_item", "numbered_list_item"]);
 
-async function renderBlocks(blocks, footnotes, isTopLevel = false) {
+async function renderBlocks(blocks, footnotes, slug, isTopLevel = false) {
   // Markdown list items render as a "tight" list (no extra spacing) only when
   // they aren't separated by blank lines, so consecutive list-item blocks are
   // joined with a single newline; everything else keeps a blank line between.
@@ -224,14 +244,33 @@ async function renderBlocks(blocks, footnotes, isTopLevel = false) {
       case "paragraph":
         parts.push(renderInline(block.paragraph.rich_text));
         break;
-      case "quote":
+      case "quote": {
+        const text = renderInline(block.quote.rich_text);
+        const nested = await renderBlocks(children, footnotes, slug);
+        const combined = [text, nested].filter(Boolean).join("\n\n");
         parts.push(
-          renderInline(block.quote.rich_text)
+          combined
             .split("\n")
-            .map((line) => `> ${line}`)
+            .map((line) => (line.length > 0 ? `> ${line}` : ">"))
             .join("\n"),
         );
         break;
+      }
+      case "image": {
+        const caption = renderInline(block.image.caption);
+        let src;
+        if (block.image.type === "external") {
+          src = block.image.external.url;
+        } else {
+          const ext =
+            new URL(block.image.file.url).pathname.match(/\.[a-zA-Z0-9]+$/)?.[0] ?? ".png";
+          const filename = `image-${block.id}${ext}`;
+          await downloadImageIfMissing(block.image.file.url, path.join(POSTS_DIR, slug, filename));
+          src = `./${filename}`;
+        }
+        parts.push(`![${caption}](${src})`);
+        break;
+      }
       case "divider":
         parts.push("---");
         break;
@@ -249,7 +288,7 @@ async function renderBlocks(blocks, footnotes, isTopLevel = false) {
       case "numbered_list_item": {
         const marker = block.type === "numbered_list_item" ? `${numberedIndex}. ` : "- ";
         const text = renderInline(block[block.type].rich_text);
-        const nested = await renderBlocks(children, footnotes);
+        const nested = await renderBlocks(children, footnotes, slug);
         parts.push(nested ? `${marker}${text}\n${indent(nested, "  ")}` : `${marker}${text}`);
         break;
       }
@@ -260,10 +299,10 @@ async function renderBlocks(blocks, footnotes, isTopLevel = false) {
           if (!match) {
             throw new Error(`최상위 토글은 각주([^key]) 전용인데 "${title}" 형태가 아님`);
           }
-          footnotes.set(match[1], await renderBlocks(children, footnotes));
+          footnotes.set(match[1], await renderBlocks(children, footnotes, slug));
           continue;
         }
-        const nested = await renderBlocks(children, footnotes);
+        const nested = await renderBlocks(children, footnotes, slug);
         parts.push(`<details>\n<summary>${title}</summary>\n\n${nested}\n\n</details>`);
         break;
       }
@@ -297,7 +336,7 @@ async function convertPage(page) {
 
   const footnotes = new Map();
   const topLevelBlocks = await listAllChildren(page.id);
-  const body = await renderBlocks(topLevelBlocks, footnotes, true);
+  const body = await renderBlocks(topLevelBlocks, footnotes, props.slug, true);
 
   const footnoteText = [...footnotes.entries()]
     .map(([key, markdown]) => renderFootnote(key, markdown))
